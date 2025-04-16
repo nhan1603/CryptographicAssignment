@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/nhan1603/ReminoAssignment/api/internal/appconfig/iam"
-	"github.com/nhan1603/ReminoAssignment/api/internal/model"
-	"github.com/nhan1603/ReminoAssignment/api/internal/repository/user"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/appconfig/iam"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/model"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/repository/user"
 	pkgerrors "github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )

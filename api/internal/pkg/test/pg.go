@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/nhan1603/ReminoAssignment/api/internal/appconfig/db/pg"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/appconfig/db/pg"
 	"github.com/stretchr/testify/require"
 )
 

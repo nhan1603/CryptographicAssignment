@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/nhan1603/ReminoAssignment/api/internal/appconfig/httpserver"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/appconfig/httpserver"
 )
 
 // ErrAuthenticationFailed represents authentication failure

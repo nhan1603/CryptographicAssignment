@@ -1,6 +1,6 @@
 package auth
 
-import "github.com/nhan1603/ReminoAssignment/api/internal/controller/auth"
+import "github.com/nhan1603/CryptographicAssignment/api/internal/controller/auth"
 
 // Handler is the web handler for this pkg
 type Handler struct {

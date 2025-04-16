@@ -1,4 +1,4 @@
-# ReminoAssignment
+# CryptographicAssignment
 
 Assignment for Remitano Interview preparation
 

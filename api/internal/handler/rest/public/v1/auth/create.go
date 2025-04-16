@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/nhan1603/ReminoAssignment/api/internal/appconfig/httpserver"
-	"github.com/nhan1603/ReminoAssignment/api/internal/model"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/appconfig/httpserver"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/model"
 )
 
 // CreateUserResponse represents result of creating user

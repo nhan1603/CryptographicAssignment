@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/nhan1603/ReminoAssignment/api/internal/appconfig/httpserver"
-	"github.com/nhan1603/ReminoAssignment/api/internal/appconfig/iam"
-	"github.com/nhan1603/ReminoAssignment/api/internal/controller/videos"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/appconfig/httpserver"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/appconfig/iam"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/controller/videos"
 )
 
 func (h Handler) ShareVideo() http.HandlerFunc {

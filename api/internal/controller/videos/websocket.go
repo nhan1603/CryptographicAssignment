@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/gorilla/websocket"
-	"github.com/nhan1603/ReminoAssignment/api/internal/model"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/model"
 )
 
 // BroadCastResponse broadcasts alert to client

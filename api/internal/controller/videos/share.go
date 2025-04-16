@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/nhan1603/ReminoAssignment/api/internal/model"
-	"github.com/nhan1603/ReminoAssignment/api/internal/pkg/validator"
-	"github.com/nhan1603/ReminoAssignment/api/internal/repository/user"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/model"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/pkg/validator"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/repository/user"
 )
 
 func (i impl) ShareVideo(ctx context.Context, videoUrl, videoTitle, sharerEmail string) error {

@@ -7,19 +7,18 @@ import (
 	"os"
 
 	"github.com/gorilla/websocket"
-	"github.com/nhan1603/ReminoAssignment/api/internal/appconfig/db/pg"
-	"github.com/nhan1603/ReminoAssignment/api/internal/appconfig/httpserver"
-	"github.com/nhan1603/ReminoAssignment/api/internal/appconfig/iam"
-	"github.com/nhan1603/ReminoAssignment/api/internal/controller/auth"
-	"github.com/nhan1603/ReminoAssignment/api/internal/controller/videos"
-	"github.com/nhan1603/ReminoAssignment/api/internal/model"
-	"github.com/nhan1603/ReminoAssignment/api/internal/repository"
-	"github.com/nhan1603/ReminoAssignment/api/internal/repository/generator"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/appconfig/db/pg"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/appconfig/httpserver"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/appconfig/iam"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/controller/auth"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/controller/videos"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/model"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/repository"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/repository/generator"
 )
 
 func main() {
-	log.Println("Remitano Assignment API")
-
+	log.Println("CryptoGraphy Assignment API")
 	ctx := context.Background()
 
 	iamConfig := iam.NewConfig()

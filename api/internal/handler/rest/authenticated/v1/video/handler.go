@@ -1,6 +1,6 @@
 package video
 
-import "github.com/nhan1603/ReminoAssignment/api/internal/controller/videos"
+import "github.com/nhan1603/CryptographicAssignment/api/internal/controller/videos"
 
 // Handler is the web handler for this pkg
 type Handler struct {

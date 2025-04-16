@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 
-	"github.com/nhan1603/ReminoAssignment/api/internal/model"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/model"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 )
 

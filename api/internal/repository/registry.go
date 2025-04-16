@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/nhan1603/ReminoAssignment/api/internal/repository/user"
-	"github.com/nhan1603/ReminoAssignment/api/internal/repository/video"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/repository/user"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/repository/video"
 	pkgerrors "github.com/pkg/errors"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 )

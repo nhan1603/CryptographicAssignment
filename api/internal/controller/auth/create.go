@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/nhan1603/ReminoAssignment/api/internal/model"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/model"
 	"golang.org/x/crypto/bcrypt"
 )
 

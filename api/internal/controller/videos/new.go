@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/gorilla/websocket"
-	"github.com/nhan1603/ReminoAssignment/api/internal/model"
-	"github.com/nhan1603/ReminoAssignment/api/internal/repository"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/model"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/repository"
 )
 
 // Controller represents the specification of this pkg

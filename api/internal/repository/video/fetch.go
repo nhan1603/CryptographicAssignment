@@ -3,8 +3,8 @@ package video
 import (
 	"context"
 
-	"github.com/nhan1603/ReminoAssignment/api/internal/model"
-	"github.com/nhan1603/ReminoAssignment/api/internal/repository/dbmodel"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/model"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/repository/dbmodel"
 	pkgerrors "github.com/pkg/errors"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )

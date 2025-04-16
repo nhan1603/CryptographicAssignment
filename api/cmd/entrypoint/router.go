@@ -6,12 +6,12 @@ import (
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
-	"github.com/nhan1603/ReminoAssignment/api/internal/appconfig/iam"
-	"github.com/nhan1603/ReminoAssignment/api/internal/controller/auth"
-	"github.com/nhan1603/ReminoAssignment/api/internal/controller/videos"
-	videoHandler "github.com/nhan1603/ReminoAssignment/api/internal/handler/rest/authenticated/v1/video"
-	authHandler "github.com/nhan1603/ReminoAssignment/api/internal/handler/rest/public/v1/auth"
-	publicVideoHandler "github.com/nhan1603/ReminoAssignment/api/internal/handler/rest/public/v1/video"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/appconfig/iam"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/controller/auth"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/controller/videos"
+	videoHandler "github.com/nhan1603/CryptographicAssignment/api/internal/handler/rest/authenticated/v1/video"
+	authHandler "github.com/nhan1603/CryptographicAssignment/api/internal/handler/rest/public/v1/auth"
+	publicVideoHandler "github.com/nhan1603/CryptographicAssignment/api/internal/handler/rest/public/v1/video"
 )
 
 type router struct {

@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/websocket"
-	"github.com/nhan1603/ReminoAssignment/api/internal/appconfig/httpserver"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/appconfig/httpserver"
 )
 
 // BroadCastResponse broadcasts email of new video to client

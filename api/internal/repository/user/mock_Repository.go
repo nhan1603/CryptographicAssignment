@@ -5,7 +5,7 @@ package user
 import (
 	context "context"
 
-	model "github.com/nhan1603/ReminoAssignment/api/internal/model"
+	model "github.com/nhan1603/CryptographicAssignment/api/internal/model"
 	mock "github.com/stretchr/testify/mock"
 )
 

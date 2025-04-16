@@ -1,4 +1,4 @@
-module github.com/nhan1603/Cryptographic-Assignment/api
+module github.com/nhan1603/CryptographicAssignment/api
 
 go 1.20
 

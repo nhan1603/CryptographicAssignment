@@ -1,6 +1,6 @@
 package generator
 
-import "github.com/nhan1603/ReminoAssignment/api/internal/pkg/snowflake"
+import "github.com/nhan1603/CryptographicAssignment/api/internal/pkg/snowflake"
 
 var (
 	DeviceTokenIDSNF snowflake.SnowflakeGenerator

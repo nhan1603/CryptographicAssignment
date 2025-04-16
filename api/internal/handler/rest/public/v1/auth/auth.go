@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/nhan1603/ReminoAssignment/api/internal/appconfig/httpserver"
-	"github.com/nhan1603/ReminoAssignment/api/internal/controller/auth"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/appconfig/httpserver"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/controller/auth"
 )
 
 // AuthRequest holds the input payload for authentication request
