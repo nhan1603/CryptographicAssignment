@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: remino-pg
+      POSTGRES_DB: cryptography-pg
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 10s
@@ -32,7 +32,7 @@ services:
         "-path",
         "/migrations",
         "-database",
-        "postgres://postgres:postgres@database:5432/remino-pg?sslmode=disable",
+        "postgres://postgres:postgres@database:5432/cryptography-pg?sslmode=disable",
       ]
     command: ["up"]
     depends_on:
@@ -41,7 +41,7 @@ services:
 
   server:
     container_name: api
-    image: CryptographicAssignment-go-local:latest
+    image: cryptography-go-local:latest
     working_dir: /app
     volumes:
       - ../api:/app
@@ -53,7 +53,7 @@ services:
     depends_on:
       - database
     environment:
-      PG_URL: postgres://postgres:postgres@database:5432/remino-pg?sslmode=disable
+      PG_URL: postgres://postgres:postgres@database:5432/cryptography-pg?sslmode=disable
       SERVER_ADDR: ":3001"
       SGT_LOC: "Asia/Singapore"
       JWT_KEY: "CCO3rTNkzj5ll9JogQW5"
@@ -65,8 +65,7 @@ services:
       - ../api:/api
 networks:
   network:
-    name: remino
-    external: true
+    name: cryptography
 
 volumes:
   data:

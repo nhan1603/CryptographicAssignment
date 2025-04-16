@@ -4,7 +4,7 @@
 DOCKER_COMPOSE_FILE ?= build/docker-compose.local.yaml
 DATABASE_CONTAINER ?= database
 API_CONTAINER ?= server
-PROJECT_NAME ?= paypalCryptography
+PROJECT_NAME ?= cryptography
 
 build-local-go-image:
 	docker build -f build/local.go.Dockerfile -t ${PROJECT_NAME}-go-local:latest .

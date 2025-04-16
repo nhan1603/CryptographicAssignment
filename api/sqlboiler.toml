@@ -7,7 +7,7 @@ no-hooks = true
 no-tests = true
 
 [psql] # This is the postgres config, which should be self explanatory.
-dbname = "remino-pg"
+dbname = "cryptography-pg"
 host = "database"
 port = 5432
 user = "postgres"
