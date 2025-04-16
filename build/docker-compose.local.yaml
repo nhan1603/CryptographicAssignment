@@ -1,0 +1,73 @@
+services:
+  database:
+    container_name: pg
+    image: postgres:15-alpine
+    restart: always
+    networks:
+      - network
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: remino-pg
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+    ports:
+      - "5432:5432"
+    volumes:
+      - data:/var/lib/postgresql/data
+
+  migrate:
+    image: migrate/migrate:v4.15.2
+    profiles: [ "tools" ]
+    networks:
+      - network
+    volumes:
+      - ../api/data/migrations:/migrations
+    entrypoint:
+      [
+        "migrate",
+        "-path",
+        "/migrations",
+        "-database",
+        "postgres://postgres:postgres@database:5432/remino-pg?sslmode=disable",
+      ]
+    command: [ "up" ]
+    depends_on:
+      database:
+        condition: service_healthy
+
+  server:
+    container_name: api
+    image: reminoassignment-go-local:latest
+    working_dir: /app
+    volumes:
+      - ../api:/app
+    command: go run -mod=vendor cmd/entrypoint/main.go cmd/entrypoint/router.go
+    ports:
+      - "3001:3001"
+    networks:
+      - network
+    depends_on:
+      - database
+    environment:
+      PG_URL: postgres://postgres:postgres@database:5432/remino-pg?sslmode=disable
+      SERVER_ADDR: ":3001"
+      SGT_LOC: "Asia/Singapore"
+      JWT_KEY: "CCO3rTNkzj5ll9JogQW5"
+
+
+  mockery:
+    container_name: mockery
+    image: vektra/mockery:v2.20.0
+    volumes:
+      - ../api:/api
+networks:
+  network:
+    name: remino
+    external: true
+
+volumes:
+  data:
