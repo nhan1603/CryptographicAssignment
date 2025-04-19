@@ -1,4 +1,4 @@
-package video
+package operation
 
 import (
 	"net/http"
@@ -7,8 +7,8 @@ import (
 	"github.com/nhan1603/CryptographicAssignment/api/internal/model"
 )
 
-type ListVideoResponse struct {
-	Videos model.ListSharedVideo `json:"videos"`
+type MenuResponse struct {
+	Items []model.MenuItem `json:"items"`
 }
 
 // Web errors
@@ -16,16 +16,16 @@ var (
 	webInternalSerror = &httpserver.Error{Status: http.StatusInternalServerError, Code: "internal_error", Desc: "Something went wrong"}
 )
 
-func (h Handler) ListVideo() http.HandlerFunc {
+func (h Handler) GetMenuItems() http.HandlerFunc {
 	return httpserver.HandlerErr(func(w http.ResponseWriter, r *http.Request) error {
 
-		videoData, err := h.videoCtrl.GetSharedVideo(r.Context())
+		menuData, err := h.menuCtrl.GetAllItems(r.Context())
 		if err != nil {
 			return webInternalSerror
 		}
 
-		httpserver.RespondJSON(w, ListVideoResponse{
-			Videos: videoData,
+		httpserver.RespondJSON(w, MenuResponse{
+			Items: menuData,
 		})
 
 		return nil

@@ -1,40 +1,34 @@
 package menus
 
 import (
+	"context"
 	"errors"
 
 	"github.com/nhan1603/CryptographicAssignment/api/internal/model"
 )
 
-func (c impl) GetAllItems() ([]model.MenuItem, error) {
-	return c.repo.GetAll()
+func (c impl) GetAllItems(ctx context.Context) ([]model.MenuItem, error) {
+	return c.repo.Menu().GetAll(ctx)
 }
 
-func (c impl) GetItemByID(id int64) (model.MenuItem, error) {
-	item, err := c.repo.GetByID(id)
+func (c impl) GetItemByID(ctx context.Context, id int) (model.MenuItem, error) {
+	item, err := c.repo.Menu().GetByID(ctx, id)
 	if err != nil {
 		return model.MenuItem{}, err
-	}
-	if item == nil {
-		return model.MenuItem{}, errors.New("menu item not found")
 	}
 	return item, nil
 }
 
-func (c impl) CreateItem(item model.MenuItem) error {
+func (c impl) CreateItem(ctx context.Context, item model.MenuItem) error {
 	if item.Name == "" || item.Price <= 0 {
 		return errors.New("invalid menu item data")
 	}
-	return c.repo.Create(item model.MenuItem)
+	return c.repo.Menu().Create(ctx, item)
 }
 
-func (c impl) UpdateItem(item model.MenuItem) error {
+func (c impl) UpdateItem(ctx context.Context, item model.MenuItem) error {
 	if item.ID <= 0 || item.Name == "" || item.Price <= 0 {
 		return errors.New("invalid menu item data")
 	}
-	return c.repo.Update(item)
-}
-
-func (c impl) DeleteItem(id int64) error {
-	return c.repo.Delete(id)
+	return c.repo.Menu().Update(ctx, item)
 }

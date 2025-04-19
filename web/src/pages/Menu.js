@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Grid, Typography, CircularProgress } from '@mui/material';
 import MenuItemCard from '../components/MenuItemCard';
-import { mockMenuItems } from '../mockData/menuItem';
 
 const Menu = () => {
   const [menuItems, setMenuItems] = useState([]);
@@ -9,18 +8,23 @@ const Menu = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    setTimeout(() => {
-      setMenuItems(mockMenuItems);
-      setLoading(false);
-    }, 1000);
+    fetchMenuItems();
   }, []);
 
   const fetchMenuItems = async () => {
     try {
-      const response = await fetch('/api/menu-items');
-      if (!response.ok) throw new Error('Failed to fetch menu items');
-      const data = await response.json();
-      setMenuItems(data);
+      const response = await fetch('/api/public/v1/menu');
+      if (!response.ok) {
+        throw new Error('Failed to fetch menu items');
+      }
+      const responseData = await response.json();
+      
+      // Assuming the API returns { success: boolean, data: MenuItem[] }
+      if (responseData) {
+        setMenuItems(responseData.items);
+      } else {
+        throw new Error(responseData.error || 'Failed to fetch menu items');
+      }
     } catch (err) {
       setError(err.message);
     } finally {

@@ -11,9 +11,9 @@ type MenuItem struct {
 	Description string    `json:"description" db:"description"`
 	Price       float64   `json:"price" db:"price"`
 	Category    string    `json:"category" db:"category"`
-	ImageUrl    string    `json:"image_url" db:"image_url"`
-	IsAvailable bool      `json:"is_available" db:"is_available"`
-	CreatedAt   time.Time `json:"created_at" db:"created_at"`
+	ImageUrl    string    `json:"imageUrl" db:"image_url"`
+	IsAvailable bool      `json:"isAvailable" db:"is_available"`
+	CreatedAt   time.Time `json:"createdAt" db:"created_at"`
 }
 
 // Order represents a food order placed by a user

@@ -15,7 +15,7 @@ func (c impl) CreateOrder(ctx context.Context, order model.Order) error {
 
 	// Calculate total amount and validate items
 	var totalAmount float64
-	for _, item := range order.Items {
+	for indx, item := range order.Items {
 		menuItem, err := c.repo.Menu().GetByID(ctx, int(item.MenuItemID))
 		if err != nil {
 			return err
@@ -28,6 +28,7 @@ func (c impl) CreateOrder(ctx context.Context, order model.Order) error {
 		item.UnitPrice = menuItem.Price
 		item.Subtotal = menuItem.Price * float64(item.Quantity)
 		totalAmount += item.Subtotal
+		order.Items[indx] = item
 	}
 
 	order.TotalAmount = totalAmount
@@ -57,12 +58,11 @@ func (c impl) UpdateOrderStatus(ctx context.Context, id int, status string) erro
 		return errors.New("invalid order status")
 	}
 
-	order, err := c.repo.Order().GetByID(ctx, id)
+	_, err := c.repo.Order().GetByID(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	order.Status = status
 	return c.repo.Order().UpdateStatus(ctx, id, status)
 }
 
