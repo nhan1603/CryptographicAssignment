@@ -19,20 +19,19 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"github.com/volatiletech/sqlboiler/v4/queries/qmhelper"
-	"github.com/volatiletech/sqlboiler/v4/types"
 	"github.com/volatiletech/strmangle"
 )
 
 // PaypalTransaction is an object representing the database table.
 type PaypalTransaction struct {
-	ID                  int           `boil:"id" json:"id" toml:"id" yaml:"id"`
-	OrderID             null.Int      `boil:"order_id" json:"order_id,omitempty" toml:"order_id" yaml:"order_id,omitempty"`
-	PaypalTransactionID string        `boil:"paypal_transaction_id" json:"paypal_transaction_id" toml:"paypal_transaction_id" yaml:"paypal_transaction_id"`
-	PaymentStatus       string        `boil:"payment_status" json:"payment_status" toml:"payment_status" yaml:"payment_status"`
-	PaymentAmount       types.Decimal `boil:"payment_amount" json:"payment_amount" toml:"payment_amount" yaml:"payment_amount"`
-	Currency            null.String   `boil:"currency" json:"currency,omitempty" toml:"currency" yaml:"currency,omitempty"`
-	PayerEmail          null.String   `boil:"payer_email" json:"payer_email,omitempty" toml:"payer_email" yaml:"payer_email,omitempty"`
-	PaymentDate         null.Time     `boil:"payment_date" json:"payment_date,omitempty" toml:"payment_date" yaml:"payment_date,omitempty"`
+	ID                  int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	OrderID             int         `boil:"order_id" json:"order_id" toml:"order_id" yaml:"order_id"`
+	PaypalTransactionID string      `boil:"paypal_transaction_id" json:"paypal_transaction_id" toml:"paypal_transaction_id" yaml:"paypal_transaction_id"`
+	PaymentStatus       string      `boil:"payment_status" json:"payment_status" toml:"payment_status" yaml:"payment_status"`
+	PaymentAmount       float64     `boil:"payment_amount" json:"payment_amount" toml:"payment_amount" yaml:"payment_amount"`
+	Currency            null.String `boil:"currency" json:"currency,omitempty" toml:"currency" yaml:"currency,omitempty"`
+	PayerEmail          null.String `boil:"payer_email" json:"payer_email,omitempty" toml:"payer_email" yaml:"payer_email,omitempty"`
+	PaymentDate         null.Time   `boil:"payment_date" json:"payment_date,omitempty" toml:"payment_date" yaml:"payment_date,omitempty"`
 
 	R *paypalTransactionR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L paypalTransactionL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -82,19 +81,19 @@ var PaypalTransactionTableColumns = struct {
 
 var PaypalTransactionWhere = struct {
 	ID                  whereHelperint
-	OrderID             whereHelpernull_Int
+	OrderID             whereHelperint
 	PaypalTransactionID whereHelperstring
 	PaymentStatus       whereHelperstring
-	PaymentAmount       whereHelpertypes_Decimal
+	PaymentAmount       whereHelperfloat64
 	Currency            whereHelpernull_String
 	PayerEmail          whereHelpernull_String
 	PaymentDate         whereHelpernull_Time
 }{
 	ID:                  whereHelperint{field: "\"paypal_transactions\".\"id\""},
-	OrderID:             whereHelpernull_Int{field: "\"paypal_transactions\".\"order_id\""},
+	OrderID:             whereHelperint{field: "\"paypal_transactions\".\"order_id\""},
 	PaypalTransactionID: whereHelperstring{field: "\"paypal_transactions\".\"paypal_transaction_id\""},
 	PaymentStatus:       whereHelperstring{field: "\"paypal_transactions\".\"payment_status\""},
-	PaymentAmount:       whereHelpertypes_Decimal{field: "\"paypal_transactions\".\"payment_amount\""},
+	PaymentAmount:       whereHelperfloat64{field: "\"paypal_transactions\".\"payment_amount\""},
 	Currency:            whereHelpernull_String{field: "\"paypal_transactions\".\"currency\""},
 	PayerEmail:          whereHelpernull_String{field: "\"paypal_transactions\".\"payer_email\""},
 	PaymentDate:         whereHelpernull_Time{field: "\"paypal_transactions\".\"payment_date\""},
@@ -129,8 +128,8 @@ type paypalTransactionL struct{}
 
 var (
 	paypalTransactionAllColumns            = []string{"id", "order_id", "paypal_transaction_id", "payment_status", "payment_amount", "currency", "payer_email", "payment_date"}
-	paypalTransactionColumnsWithoutDefault = []string{"paypal_transaction_id", "payment_status", "payment_amount"}
-	paypalTransactionColumnsWithDefault    = []string{"id", "order_id", "currency", "payer_email", "payment_date"}
+	paypalTransactionColumnsWithoutDefault = []string{"order_id", "paypal_transaction_id", "payment_status", "payment_amount"}
+	paypalTransactionColumnsWithDefault    = []string{"id", "currency", "payer_email", "payment_date"}
 	paypalTransactionPrimaryKeyColumns     = []string{"id"}
 	paypalTransactionGeneratedColumns      = []string{}
 )
@@ -270,9 +269,7 @@ func (paypalTransactionL) LoadOrder(ctx context.Context, e boil.ContextExecutor,
 		if object.R == nil {
 			object.R = &paypalTransactionR{}
 		}
-		if !queries.IsNil(object.OrderID) {
-			args[object.OrderID] = struct{}{}
-		}
+		args[object.OrderID] = struct{}{}
 
 	} else {
 		for _, obj := range slice {
@@ -280,9 +277,7 @@ func (paypalTransactionL) LoadOrder(ctx context.Context, e boil.ContextExecutor,
 				obj.R = &paypalTransactionR{}
 			}
 
-			if !queries.IsNil(obj.OrderID) {
-				args[obj.OrderID] = struct{}{}
-			}
+			args[obj.OrderID] = struct{}{}
 
 		}
 	}
@@ -339,7 +334,7 @@ func (paypalTransactionL) LoadOrder(ctx context.Context, e boil.ContextExecutor,
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if queries.Equal(local.OrderID, foreign.ID) {
+			if local.OrderID == foreign.ID {
 				local.R.Order = foreign
 				if foreign.R == nil {
 					foreign.R = &orderR{}
@@ -380,7 +375,7 @@ func (o *PaypalTransaction) SetOrder(ctx context.Context, exec boil.ContextExecu
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	queries.Assign(&o.OrderID, related.ID)
+	o.OrderID = related.ID
 	if o.R == nil {
 		o.R = &paypalTransactionR{
 			Order: related,
@@ -397,39 +392,6 @@ func (o *PaypalTransaction) SetOrder(ctx context.Context, exec boil.ContextExecu
 		related.R.PaypalTransactions = append(related.R.PaypalTransactions, o)
 	}
 
-	return nil
-}
-
-// RemoveOrder relationship.
-// Sets o.R.Order to nil.
-// Removes o from all passed in related items' relationships struct.
-func (o *PaypalTransaction) RemoveOrder(ctx context.Context, exec boil.ContextExecutor, related *Order) error {
-	var err error
-
-	queries.SetScanner(&o.OrderID, nil)
-	if _, err = o.Update(ctx, exec, boil.Whitelist("order_id")); err != nil {
-		return errors.Wrap(err, "failed to update local table")
-	}
-
-	if o.R != nil {
-		o.R.Order = nil
-	}
-	if related == nil || related.R == nil {
-		return nil
-	}
-
-	for i, ri := range related.R.PaypalTransactions {
-		if queries.Equal(o.OrderID, ri.OrderID) {
-			continue
-		}
-
-		ln := len(related.R.PaypalTransactions)
-		if ln > 1 && i < ln-1 {
-			related.R.PaypalTransactions[i] = related.R.PaypalTransactions[ln-1]
-		}
-		related.R.PaypalTransactions = related.R.PaypalTransactions[:ln-1]
-		break
-	}
 	return nil
 }
 

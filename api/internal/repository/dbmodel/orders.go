@@ -19,18 +19,16 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"github.com/volatiletech/sqlboiler/v4/queries/qmhelper"
-	"github.com/volatiletech/sqlboiler/v4/types"
 	"github.com/volatiletech/strmangle"
 )
 
 // Order is an object representing the database table.
 type Order struct {
-	ID          int           `boil:"id" json:"id" toml:"id" yaml:"id"`
-	UserID      null.Int      `boil:"user_id" json:"user_id,omitempty" toml:"user_id" yaml:"user_id,omitempty"`
-	TotalAmount types.Decimal `boil:"total_amount" json:"total_amount" toml:"total_amount" yaml:"total_amount"`
-	Status      string        `boil:"status" json:"status" toml:"status" yaml:"status"`
-	PickupTime  null.Time     `boil:"pickup_time" json:"pickup_time,omitempty" toml:"pickup_time" yaml:"pickup_time,omitempty"`
-	CreatedAt   null.Time     `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
+	ID          int       `boil:"id" json:"id" toml:"id" yaml:"id"`
+	UserID      int       `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	TotalAmount float64   `boil:"total_amount" json:"total_amount" toml:"total_amount" yaml:"total_amount"`
+	Status      string    `boil:"status" json:"status" toml:"status" yaml:"status"`
+	CreatedAt   null.Time `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
 
 	R *orderR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L orderL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -41,14 +39,12 @@ var OrderColumns = struct {
 	UserID      string
 	TotalAmount string
 	Status      string
-	PickupTime  string
 	CreatedAt   string
 }{
 	ID:          "id",
 	UserID:      "user_id",
 	TotalAmount: "total_amount",
 	Status:      "status",
-	PickupTime:  "pickup_time",
 	CreatedAt:   "created_at",
 }
 
@@ -57,14 +53,12 @@ var OrderTableColumns = struct {
 	UserID      string
 	TotalAmount string
 	Status      string
-	PickupTime  string
 	CreatedAt   string
 }{
 	ID:          "orders.id",
 	UserID:      "orders.user_id",
 	TotalAmount: "orders.total_amount",
 	Status:      "orders.status",
-	PickupTime:  "orders.pickup_time",
 	CreatedAt:   "orders.created_at",
 }
 
@@ -72,17 +66,15 @@ var OrderTableColumns = struct {
 
 var OrderWhere = struct {
 	ID          whereHelperint
-	UserID      whereHelpernull_Int
-	TotalAmount whereHelpertypes_Decimal
+	UserID      whereHelperint
+	TotalAmount whereHelperfloat64
 	Status      whereHelperstring
-	PickupTime  whereHelpernull_Time
 	CreatedAt   whereHelpernull_Time
 }{
 	ID:          whereHelperint{field: "\"orders\".\"id\""},
-	UserID:      whereHelpernull_Int{field: "\"orders\".\"user_id\""},
-	TotalAmount: whereHelpertypes_Decimal{field: "\"orders\".\"total_amount\""},
+	UserID:      whereHelperint{field: "\"orders\".\"user_id\""},
+	TotalAmount: whereHelperfloat64{field: "\"orders\".\"total_amount\""},
 	Status:      whereHelperstring{field: "\"orders\".\"status\""},
-	PickupTime:  whereHelpernull_Time{field: "\"orders\".\"pickup_time\""},
 	CreatedAt:   whereHelpernull_Time{field: "\"orders\".\"created_at\""},
 }
 
@@ -134,9 +126,9 @@ func (r *orderR) GetPaypalTransactions() PaypalTransactionSlice {
 type orderL struct{}
 
 var (
-	orderAllColumns            = []string{"id", "user_id", "total_amount", "status", "pickup_time", "created_at"}
-	orderColumnsWithoutDefault = []string{"total_amount"}
-	orderColumnsWithDefault    = []string{"id", "user_id", "status", "pickup_time", "created_at"}
+	orderAllColumns            = []string{"id", "user_id", "total_amount", "status", "created_at"}
+	orderColumnsWithoutDefault = []string{"user_id", "total_amount"}
+	orderColumnsWithDefault    = []string{"id", "status", "created_at"}
 	orderPrimaryKeyColumns     = []string{"id"}
 	orderGeneratedColumns      = []string{}
 )
@@ -304,9 +296,7 @@ func (orderL) LoadUser(ctx context.Context, e boil.ContextExecutor, singular boo
 		if object.R == nil {
 			object.R = &orderR{}
 		}
-		if !queries.IsNil(object.UserID) {
-			args[object.UserID] = struct{}{}
-		}
+		args[object.UserID] = struct{}{}
 
 	} else {
 		for _, obj := range slice {
@@ -314,9 +304,7 @@ func (orderL) LoadUser(ctx context.Context, e boil.ContextExecutor, singular boo
 				obj.R = &orderR{}
 			}
 
-			if !queries.IsNil(obj.UserID) {
-				args[obj.UserID] = struct{}{}
-			}
+			args[obj.UserID] = struct{}{}
 
 		}
 	}
@@ -373,7 +361,7 @@ func (orderL) LoadUser(ctx context.Context, e boil.ContextExecutor, singular boo
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if queries.Equal(local.UserID, foreign.ID) {
+			if local.UserID == foreign.ID {
 				local.R.User = foreign
 				if foreign.R == nil {
 					foreign.R = &userR{}
@@ -479,7 +467,7 @@ func (orderL) LoadOrderItems(ctx context.Context, e boil.ContextExecutor, singul
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if queries.Equal(local.ID, foreign.OrderID) {
+			if local.ID == foreign.OrderID {
 				local.R.OrderItems = append(local.R.OrderItems, foreign)
 				if foreign.R == nil {
 					foreign.R = &orderItemR{}
@@ -585,7 +573,7 @@ func (orderL) LoadPaypalTransactions(ctx context.Context, e boil.ContextExecutor
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if queries.Equal(local.ID, foreign.OrderID) {
+			if local.ID == foreign.OrderID {
 				local.R.PaypalTransactions = append(local.R.PaypalTransactions, foreign)
 				if foreign.R == nil {
 					foreign.R = &paypalTransactionR{}
@@ -626,7 +614,7 @@ func (o *Order) SetUser(ctx context.Context, exec boil.ContextExecutor, insert b
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	queries.Assign(&o.UserID, related.ID)
+	o.UserID = related.ID
 	if o.R == nil {
 		o.R = &orderR{
 			User: related,
@@ -646,39 +634,6 @@ func (o *Order) SetUser(ctx context.Context, exec boil.ContextExecutor, insert b
 	return nil
 }
 
-// RemoveUser relationship.
-// Sets o.R.User to nil.
-// Removes o from all passed in related items' relationships struct.
-func (o *Order) RemoveUser(ctx context.Context, exec boil.ContextExecutor, related *User) error {
-	var err error
-
-	queries.SetScanner(&o.UserID, nil)
-	if _, err = o.Update(ctx, exec, boil.Whitelist("user_id")); err != nil {
-		return errors.Wrap(err, "failed to update local table")
-	}
-
-	if o.R != nil {
-		o.R.User = nil
-	}
-	if related == nil || related.R == nil {
-		return nil
-	}
-
-	for i, ri := range related.R.Orders {
-		if queries.Equal(o.UserID, ri.UserID) {
-			continue
-		}
-
-		ln := len(related.R.Orders)
-		if ln > 1 && i < ln-1 {
-			related.R.Orders[i] = related.R.Orders[ln-1]
-		}
-		related.R.Orders = related.R.Orders[:ln-1]
-		break
-	}
-	return nil
-}
-
 // AddOrderItems adds the given related objects to the existing relationships
 // of the order, optionally inserting them as new records.
 // Appends related to o.R.OrderItems.
@@ -687,7 +642,7 @@ func (o *Order) AddOrderItems(ctx context.Context, exec boil.ContextExecutor, in
 	var err error
 	for _, rel := range related {
 		if insert {
-			queries.Assign(&rel.OrderID, o.ID)
+			rel.OrderID = o.ID
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
@@ -708,7 +663,7 @@ func (o *Order) AddOrderItems(ctx context.Context, exec boil.ContextExecutor, in
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			queries.Assign(&rel.OrderID, o.ID)
+			rel.OrderID = o.ID
 		}
 	}
 
@@ -732,80 +687,6 @@ func (o *Order) AddOrderItems(ctx context.Context, exec boil.ContextExecutor, in
 	return nil
 }
 
-// SetOrderItems removes all previously related items of the
-// order replacing them completely with the passed
-// in related items, optionally inserting them as new records.
-// Sets o.R.Order's OrderItems accordingly.
-// Replaces o.R.OrderItems with related.
-// Sets related.R.Order's OrderItems accordingly.
-func (o *Order) SetOrderItems(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*OrderItem) error {
-	query := "update \"order_items\" set \"order_id\" = null where \"order_id\" = $1"
-	values := []interface{}{o.ID}
-	if boil.IsDebug(ctx) {
-		writer := boil.DebugWriterFrom(ctx)
-		fmt.Fprintln(writer, query)
-		fmt.Fprintln(writer, values)
-	}
-	_, err := exec.ExecContext(ctx, query, values...)
-	if err != nil {
-		return errors.Wrap(err, "failed to remove relationships before set")
-	}
-
-	if o.R != nil {
-		for _, rel := range o.R.OrderItems {
-			queries.SetScanner(&rel.OrderID, nil)
-			if rel.R == nil {
-				continue
-			}
-
-			rel.R.Order = nil
-		}
-		o.R.OrderItems = nil
-	}
-
-	return o.AddOrderItems(ctx, exec, insert, related...)
-}
-
-// RemoveOrderItems relationships from objects passed in.
-// Removes related items from R.OrderItems (uses pointer comparison, removal does not keep order)
-// Sets related.R.Order.
-func (o *Order) RemoveOrderItems(ctx context.Context, exec boil.ContextExecutor, related ...*OrderItem) error {
-	if len(related) == 0 {
-		return nil
-	}
-
-	var err error
-	for _, rel := range related {
-		queries.SetScanner(&rel.OrderID, nil)
-		if rel.R != nil {
-			rel.R.Order = nil
-		}
-		if _, err = rel.Update(ctx, exec, boil.Whitelist("order_id")); err != nil {
-			return err
-		}
-	}
-	if o.R == nil {
-		return nil
-	}
-
-	for _, rel := range related {
-		for i, ri := range o.R.OrderItems {
-			if rel != ri {
-				continue
-			}
-
-			ln := len(o.R.OrderItems)
-			if ln > 1 && i < ln-1 {
-				o.R.OrderItems[i] = o.R.OrderItems[ln-1]
-			}
-			o.R.OrderItems = o.R.OrderItems[:ln-1]
-			break
-		}
-	}
-
-	return nil
-}
-
 // AddPaypalTransactions adds the given related objects to the existing relationships
 // of the order, optionally inserting them as new records.
 // Appends related to o.R.PaypalTransactions.
@@ -814,7 +695,7 @@ func (o *Order) AddPaypalTransactions(ctx context.Context, exec boil.ContextExec
 	var err error
 	for _, rel := range related {
 		if insert {
-			queries.Assign(&rel.OrderID, o.ID)
+			rel.OrderID = o.ID
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
@@ -835,7 +716,7 @@ func (o *Order) AddPaypalTransactions(ctx context.Context, exec boil.ContextExec
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			queries.Assign(&rel.OrderID, o.ID)
+			rel.OrderID = o.ID
 		}
 	}
 
@@ -856,80 +737,6 @@ func (o *Order) AddPaypalTransactions(ctx context.Context, exec boil.ContextExec
 			rel.R.Order = o
 		}
 	}
-	return nil
-}
-
-// SetPaypalTransactions removes all previously related items of the
-// order replacing them completely with the passed
-// in related items, optionally inserting them as new records.
-// Sets o.R.Order's PaypalTransactions accordingly.
-// Replaces o.R.PaypalTransactions with related.
-// Sets related.R.Order's PaypalTransactions accordingly.
-func (o *Order) SetPaypalTransactions(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*PaypalTransaction) error {
-	query := "update \"paypal_transactions\" set \"order_id\" = null where \"order_id\" = $1"
-	values := []interface{}{o.ID}
-	if boil.IsDebug(ctx) {
-		writer := boil.DebugWriterFrom(ctx)
-		fmt.Fprintln(writer, query)
-		fmt.Fprintln(writer, values)
-	}
-	_, err := exec.ExecContext(ctx, query, values...)
-	if err != nil {
-		return errors.Wrap(err, "failed to remove relationships before set")
-	}
-
-	if o.R != nil {
-		for _, rel := range o.R.PaypalTransactions {
-			queries.SetScanner(&rel.OrderID, nil)
-			if rel.R == nil {
-				continue
-			}
-
-			rel.R.Order = nil
-		}
-		o.R.PaypalTransactions = nil
-	}
-
-	return o.AddPaypalTransactions(ctx, exec, insert, related...)
-}
-
-// RemovePaypalTransactions relationships from objects passed in.
-// Removes related items from R.PaypalTransactions (uses pointer comparison, removal does not keep order)
-// Sets related.R.Order.
-func (o *Order) RemovePaypalTransactions(ctx context.Context, exec boil.ContextExecutor, related ...*PaypalTransaction) error {
-	if len(related) == 0 {
-		return nil
-	}
-
-	var err error
-	for _, rel := range related {
-		queries.SetScanner(&rel.OrderID, nil)
-		if rel.R != nil {
-			rel.R.Order = nil
-		}
-		if _, err = rel.Update(ctx, exec, boil.Whitelist("order_id")); err != nil {
-			return err
-		}
-	}
-	if o.R == nil {
-		return nil
-	}
-
-	for _, rel := range related {
-		for i, ri := range o.R.PaypalTransactions {
-			if rel != ri {
-				continue
-			}
-
-			ln := len(o.R.PaypalTransactions)
-			if ln > 1 && i < ln-1 {
-				o.R.PaypalTransactions[i] = o.R.PaypalTransactions[ln-1]
-			}
-			o.R.PaypalTransactions = o.R.PaypalTransactions[:ln-1]
-			break
-		}
-	}
-
 	return nil
 }
 

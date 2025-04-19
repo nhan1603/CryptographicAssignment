@@ -19,19 +19,19 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"github.com/volatiletech/sqlboiler/v4/queries/qmhelper"
-	"github.com/volatiletech/sqlboiler/v4/types"
 	"github.com/volatiletech/strmangle"
 )
 
 // MenuItem is an object representing the database table.
 type MenuItem struct {
-	ID          int           `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Name        string        `boil:"name" json:"name" toml:"name" yaml:"name"`
-	Description null.String   `boil:"description" json:"description,omitempty" toml:"description" yaml:"description,omitempty"`
-	Price       types.Decimal `boil:"price" json:"price" toml:"price" yaml:"price"`
-	Category    null.String   `boil:"category" json:"category,omitempty" toml:"category" yaml:"category,omitempty"`
-	IsAvailable null.Bool     `boil:"is_available" json:"is_available,omitempty" toml:"is_available" yaml:"is_available,omitempty"`
-	CreatedAt   null.Time     `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
+	ID          int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Name        string      `boil:"name" json:"name" toml:"name" yaml:"name"`
+	Description null.String `boil:"description" json:"description,omitempty" toml:"description" yaml:"description,omitempty"`
+	Price       float64     `boil:"price" json:"price" toml:"price" yaml:"price"`
+	Category    null.String `boil:"category" json:"category,omitempty" toml:"category" yaml:"category,omitempty"`
+	ImageURL    null.String `boil:"image_url" json:"image_url,omitempty" toml:"image_url" yaml:"image_url,omitempty"`
+	IsAvailable null.Bool   `boil:"is_available" json:"is_available,omitempty" toml:"is_available" yaml:"is_available,omitempty"`
+	CreatedAt   null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
 
 	R *menuItemR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L menuItemL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -43,6 +43,7 @@ var MenuItemColumns = struct {
 	Description string
 	Price       string
 	Category    string
+	ImageURL    string
 	IsAvailable string
 	CreatedAt   string
 }{
@@ -51,6 +52,7 @@ var MenuItemColumns = struct {
 	Description: "description",
 	Price:       "price",
 	Category:    "category",
+	ImageURL:    "image_url",
 	IsAvailable: "is_available",
 	CreatedAt:   "created_at",
 }
@@ -61,6 +63,7 @@ var MenuItemTableColumns = struct {
 	Description string
 	Price       string
 	Category    string
+	ImageURL    string
 	IsAvailable string
 	CreatedAt   string
 }{
@@ -69,6 +72,7 @@ var MenuItemTableColumns = struct {
 	Description: "menu_items.description",
 	Price:       "menu_items.price",
 	Category:    "menu_items.category",
+	ImageURL:    "menu_items.image_url",
 	IsAvailable: "menu_items.is_available",
 	CreatedAt:   "menu_items.created_at",
 }
@@ -185,25 +189,33 @@ func (w whereHelpernull_String) NIN(slice []string) qm.QueryMod {
 func (w whereHelpernull_String) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
 func (w whereHelpernull_String) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
-type whereHelpertypes_Decimal struct{ field string }
+type whereHelperfloat64 struct{ field string }
 
-func (w whereHelpertypes_Decimal) EQ(x types.Decimal) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.EQ, x)
-}
-func (w whereHelpertypes_Decimal) NEQ(x types.Decimal) qm.QueryMod {
+func (w whereHelperfloat64) EQ(x float64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperfloat64) NEQ(x float64) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.NEQ, x)
 }
-func (w whereHelpertypes_Decimal) LT(x types.Decimal) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpertypes_Decimal) LTE(x types.Decimal) qm.QueryMod {
+func (w whereHelperfloat64) LT(x float64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperfloat64) LTE(x float64) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.LTE, x)
 }
-func (w whereHelpertypes_Decimal) GT(x types.Decimal) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpertypes_Decimal) GTE(x types.Decimal) qm.QueryMod {
+func (w whereHelperfloat64) GT(x float64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperfloat64) GTE(x float64) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+func (w whereHelperfloat64) IN(slice []float64) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
+}
+func (w whereHelperfloat64) NIN(slice []float64) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
 }
 
 type whereHelpernull_Bool struct{ field string }
@@ -258,16 +270,18 @@ var MenuItemWhere = struct {
 	ID          whereHelperint
 	Name        whereHelperstring
 	Description whereHelpernull_String
-	Price       whereHelpertypes_Decimal
+	Price       whereHelperfloat64
 	Category    whereHelpernull_String
+	ImageURL    whereHelpernull_String
 	IsAvailable whereHelpernull_Bool
 	CreatedAt   whereHelpernull_Time
 }{
 	ID:          whereHelperint{field: "\"menu_items\".\"id\""},
 	Name:        whereHelperstring{field: "\"menu_items\".\"name\""},
 	Description: whereHelpernull_String{field: "\"menu_items\".\"description\""},
-	Price:       whereHelpertypes_Decimal{field: "\"menu_items\".\"price\""},
+	Price:       whereHelperfloat64{field: "\"menu_items\".\"price\""},
 	Category:    whereHelpernull_String{field: "\"menu_items\".\"category\""},
+	ImageURL:    whereHelpernull_String{field: "\"menu_items\".\"image_url\""},
 	IsAvailable: whereHelpernull_Bool{field: "\"menu_items\".\"is_available\""},
 	CreatedAt:   whereHelpernull_Time{field: "\"menu_items\".\"created_at\""},
 }
@@ -300,9 +314,9 @@ func (r *menuItemR) GetOrderItems() OrderItemSlice {
 type menuItemL struct{}
 
 var (
-	menuItemAllColumns            = []string{"id", "name", "description", "price", "category", "is_available", "created_at"}
+	menuItemAllColumns            = []string{"id", "name", "description", "price", "category", "image_url", "is_available", "created_at"}
 	menuItemColumnsWithoutDefault = []string{"name", "price"}
-	menuItemColumnsWithDefault    = []string{"id", "description", "category", "is_available", "created_at"}
+	menuItemColumnsWithDefault    = []string{"id", "description", "category", "image_url", "is_available", "created_at"}
 	menuItemPrimaryKeyColumns     = []string{"id"}
 	menuItemGeneratedColumns      = []string{}
 )
@@ -504,7 +518,7 @@ func (menuItemL) LoadOrderItems(ctx context.Context, e boil.ContextExecutor, sin
 
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
-			if queries.Equal(local.ID, foreign.MenuItemID) {
+			if local.ID == foreign.MenuItemID {
 				local.R.OrderItems = append(local.R.OrderItems, foreign)
 				if foreign.R == nil {
 					foreign.R = &orderItemR{}
@@ -526,7 +540,7 @@ func (o *MenuItem) AddOrderItems(ctx context.Context, exec boil.ContextExecutor,
 	var err error
 	for _, rel := range related {
 		if insert {
-			queries.Assign(&rel.MenuItemID, o.ID)
+			rel.MenuItemID = o.ID
 			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
 				return errors.Wrap(err, "failed to insert into foreign table")
 			}
@@ -547,7 +561,7 @@ func (o *MenuItem) AddOrderItems(ctx context.Context, exec boil.ContextExecutor,
 				return errors.Wrap(err, "failed to update foreign table")
 			}
 
-			queries.Assign(&rel.MenuItemID, o.ID)
+			rel.MenuItemID = o.ID
 		}
 	}
 
@@ -568,80 +582,6 @@ func (o *MenuItem) AddOrderItems(ctx context.Context, exec boil.ContextExecutor,
 			rel.R.MenuItem = o
 		}
 	}
-	return nil
-}
-
-// SetOrderItems removes all previously related items of the
-// menu_item replacing them completely with the passed
-// in related items, optionally inserting them as new records.
-// Sets o.R.MenuItem's OrderItems accordingly.
-// Replaces o.R.OrderItems with related.
-// Sets related.R.MenuItem's OrderItems accordingly.
-func (o *MenuItem) SetOrderItems(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*OrderItem) error {
-	query := "update \"order_items\" set \"menu_item_id\" = null where \"menu_item_id\" = $1"
-	values := []interface{}{o.ID}
-	if boil.IsDebug(ctx) {
-		writer := boil.DebugWriterFrom(ctx)
-		fmt.Fprintln(writer, query)
-		fmt.Fprintln(writer, values)
-	}
-	_, err := exec.ExecContext(ctx, query, values...)
-	if err != nil {
-		return errors.Wrap(err, "failed to remove relationships before set")
-	}
-
-	if o.R != nil {
-		for _, rel := range o.R.OrderItems {
-			queries.SetScanner(&rel.MenuItemID, nil)
-			if rel.R == nil {
-				continue
-			}
-
-			rel.R.MenuItem = nil
-		}
-		o.R.OrderItems = nil
-	}
-
-	return o.AddOrderItems(ctx, exec, insert, related...)
-}
-
-// RemoveOrderItems relationships from objects passed in.
-// Removes related items from R.OrderItems (uses pointer comparison, removal does not keep order)
-// Sets related.R.MenuItem.
-func (o *MenuItem) RemoveOrderItems(ctx context.Context, exec boil.ContextExecutor, related ...*OrderItem) error {
-	if len(related) == 0 {
-		return nil
-	}
-
-	var err error
-	for _, rel := range related {
-		queries.SetScanner(&rel.MenuItemID, nil)
-		if rel.R != nil {
-			rel.R.MenuItem = nil
-		}
-		if _, err = rel.Update(ctx, exec, boil.Whitelist("menu_item_id")); err != nil {
-			return err
-		}
-	}
-	if o.R == nil {
-		return nil
-	}
-
-	for _, rel := range related {
-		for i, ri := range o.R.OrderItems {
-			if rel != ri {
-				continue
-			}
-
-			ln := len(o.R.OrderItems)
-			if ln > 1 && i < ln-1 {
-				o.R.OrderItems[i] = o.R.OrderItems[ln-1]
-			}
-			o.R.OrderItems = o.R.OrderItems[:ln-1]
-			break
-		}
-	}
-
 	return nil
 }
 

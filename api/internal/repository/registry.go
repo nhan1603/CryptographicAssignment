@@ -5,15 +5,17 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/nhan1603/CryptographicAssignment/api/internal/repository/menu"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/repository/order"
 	"github.com/nhan1603/CryptographicAssignment/api/internal/repository/user"
-	"github.com/nhan1603/CryptographicAssignment/api/internal/repository/video"
 	pkgerrors "github.com/pkg/errors"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 )
 
 type Registry interface {
 	User() user.Repository
-	Video() video.Repository
+	Menu() menu.Repository
+	Order() order.Repository
 	DoInTx(ctx context.Context, txFunc TxFunc) error
 }
 
@@ -21,14 +23,16 @@ type Registry interface {
 func New(pgConn *sql.DB) Registry {
 	return impl{
 		user:   user.New(pgConn),
-		video:  video.New(pgConn),
+		menu:   menu.New(pgConn),
+		order:  order.New(pgConn),
 		pgConn: pgConn,
 	}
 }
 
 type impl struct {
 	user   user.Repository
-	video  video.Repository
+	menu   menu.Repository
+	order  order.Repository
 	txExec boil.Transactor
 	pgConn *sql.DB
 }
@@ -41,9 +45,14 @@ func (i impl) User() user.Repository {
 	return i.user
 }
 
-// Video returns video repo
-func (i impl) Video() video.Repository {
-	return i.video
+// Menu returns menu repo
+func (i impl) Menu() menu.Repository {
+	return i.menu
+}
+
+// Order returns order repo
+func (i impl) Order() order.Repository {
+	return i.order
 }
 
 // DoInTx handles db operations in a transaction
@@ -68,7 +77,8 @@ func (i impl) DoInTx(ctx context.Context, txFunc TxFunc) error {
 
 	newI := impl{
 		user:   user.New(tx),
-		video:  video.New(tx),
+		menu:   menu.New(tx),
+		order:  order.New(tx),
 		txExec: tx,
 	}
 

@@ -11,6 +11,7 @@ type MenuItem struct {
 	Description string    `json:"description" db:"description"`
 	Price       float64   `json:"price" db:"price"`
 	Category    string    `json:"category" db:"category"`
+	ImageUrl    string    `json:"image_url" db:"image_url"`
 	IsAvailable bool      `json:"is_available" db:"is_available"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
 }
@@ -21,20 +22,19 @@ type Order struct {
 	UserID      int64       `json:"user_id" db:"user_id"`
 	TotalAmount float64     `json:"total_amount" db:"total_amount"`
 	Status      string      `json:"status" db:"status"`
-	PickupTime  time.Time   `json:"pickup_time" db:"pickup_time"`
 	CreatedAt   time.Time   `json:"created_at" db:"created_at"`
 	Items       []OrderItem `json:"items,omitempty" db:"-"`
 }
 
 // OrderItem represents an individual item within an order
 type OrderItem struct {
-	ID         int64     `json:"id" db:"id"`
-	OrderID    int64     `json:"order_id" db:"order_id"`
-	MenuItemID int64     `json:"menu_item_id" db:"menu_item_id"`
-	Quantity   int       `json:"quantity" db:"quantity"`
-	UnitPrice  float64   `json:"unit_price" db:"unit_price"`
-	Subtotal   float64   `json:"subtotal" db:"subtotal"`
-	MenuItem   *MenuItem `json:"menu_item,omitempty" db:"-"`
+	ID         int64    `json:"id" db:"id"`
+	OrderID    int64    `json:"order_id" db:"order_id"`
+	MenuItemID int64    `json:"menu_item_id" db:"menu_item_id"`
+	Quantity   int      `json:"quantity" db:"quantity"`
+	UnitPrice  float64  `json:"unit_price" db:"unit_price"`
+	Subtotal   float64  `json:"subtotal" db:"subtotal"`
+	MenuItem   MenuItem `json:"menu_item,omitempty" db:"-"`
 }
 
 // PayPalTransaction represents a payment transaction through PayPal

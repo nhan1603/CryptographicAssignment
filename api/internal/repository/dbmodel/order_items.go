@@ -14,23 +14,21 @@ import (
 	"time"
 
 	"github.com/friendsofgo/errors"
-	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"github.com/volatiletech/sqlboiler/v4/queries/qmhelper"
-	"github.com/volatiletech/sqlboiler/v4/types"
 	"github.com/volatiletech/strmangle"
 )
 
 // OrderItem is an object representing the database table.
 type OrderItem struct {
-	ID         int           `boil:"id" json:"id" toml:"id" yaml:"id"`
-	OrderID    null.Int      `boil:"order_id" json:"order_id,omitempty" toml:"order_id" yaml:"order_id,omitempty"`
-	MenuItemID null.Int      `boil:"menu_item_id" json:"menu_item_id,omitempty" toml:"menu_item_id" yaml:"menu_item_id,omitempty"`
-	Quantity   int           `boil:"quantity" json:"quantity" toml:"quantity" yaml:"quantity"`
-	UnitPrice  types.Decimal `boil:"unit_price" json:"unit_price" toml:"unit_price" yaml:"unit_price"`
-	Subtotal   types.Decimal `boil:"subtotal" json:"subtotal" toml:"subtotal" yaml:"subtotal"`
+	ID         int     `boil:"id" json:"id" toml:"id" yaml:"id"`
+	OrderID    int     `boil:"order_id" json:"order_id" toml:"order_id" yaml:"order_id"`
+	MenuItemID int     `boil:"menu_item_id" json:"menu_item_id" toml:"menu_item_id" yaml:"menu_item_id"`
+	Quantity   int     `boil:"quantity" json:"quantity" toml:"quantity" yaml:"quantity"`
+	UnitPrice  float64 `boil:"unit_price" json:"unit_price" toml:"unit_price" yaml:"unit_price"`
+	Subtotal   float64 `boil:"subtotal" json:"subtotal" toml:"subtotal" yaml:"subtotal"`
 
 	R *orderItemR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L orderItemL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -70,58 +68,20 @@ var OrderItemTableColumns = struct {
 
 // Generated where
 
-type whereHelpernull_Int struct{ field string }
-
-func (w whereHelpernull_Int) EQ(x null.Int) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
-}
-func (w whereHelpernull_Int) NEQ(x null.Int) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
-}
-func (w whereHelpernull_Int) LT(x null.Int) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpernull_Int) LTE(x null.Int) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpernull_Int) GT(x null.Int) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpernull_Int) GTE(x null.Int) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-func (w whereHelpernull_Int) IN(slice []int) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
-}
-func (w whereHelpernull_Int) NIN(slice []int) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
-}
-
-func (w whereHelpernull_Int) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_Int) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
-
 var OrderItemWhere = struct {
 	ID         whereHelperint
-	OrderID    whereHelpernull_Int
-	MenuItemID whereHelpernull_Int
+	OrderID    whereHelperint
+	MenuItemID whereHelperint
 	Quantity   whereHelperint
-	UnitPrice  whereHelpertypes_Decimal
-	Subtotal   whereHelpertypes_Decimal
+	UnitPrice  whereHelperfloat64
+	Subtotal   whereHelperfloat64
 }{
 	ID:         whereHelperint{field: "\"order_items\".\"id\""},
-	OrderID:    whereHelpernull_Int{field: "\"order_items\".\"order_id\""},
-	MenuItemID: whereHelpernull_Int{field: "\"order_items\".\"menu_item_id\""},
+	OrderID:    whereHelperint{field: "\"order_items\".\"order_id\""},
+	MenuItemID: whereHelperint{field: "\"order_items\".\"menu_item_id\""},
 	Quantity:   whereHelperint{field: "\"order_items\".\"quantity\""},
-	UnitPrice:  whereHelpertypes_Decimal{field: "\"order_items\".\"unit_price\""},
-	Subtotal:   whereHelpertypes_Decimal{field: "\"order_items\".\"subtotal\""},
+	UnitPrice:  whereHelperfloat64{field: "\"order_items\".\"unit_price\""},
+	Subtotal:   whereHelperfloat64{field: "\"order_items\".\"subtotal\""},
 }
 
 // OrderItemRels is where relationship names are stored.
@@ -163,8 +123,8 @@ type orderItemL struct{}
 
 var (
 	orderItemAllColumns            = []string{"id", "order_id", "menu_item_id", "quantity", "unit_price", "subtotal"}
-	orderItemColumnsWithoutDefault = []string{"quantity", "unit_price", "subtotal"}
-	orderItemColumnsWithDefault    = []string{"id", "order_id", "menu_item_id"}
+	orderItemColumnsWithoutDefault = []string{"order_id", "menu_item_id", "quantity", "unit_price", "subtotal"}
+	orderItemColumnsWithDefault    = []string{"id"}
 	orderItemPrimaryKeyColumns     = []string{"id"}
 	orderItemGeneratedColumns      = []string{}
 )
@@ -315,9 +275,7 @@ func (orderItemL) LoadMenuItem(ctx context.Context, e boil.ContextExecutor, sing
 		if object.R == nil {
 			object.R = &orderItemR{}
 		}
-		if !queries.IsNil(object.MenuItemID) {
-			args[object.MenuItemID] = struct{}{}
-		}
+		args[object.MenuItemID] = struct{}{}
 
 	} else {
 		for _, obj := range slice {
@@ -325,9 +283,7 @@ func (orderItemL) LoadMenuItem(ctx context.Context, e boil.ContextExecutor, sing
 				obj.R = &orderItemR{}
 			}
 
-			if !queries.IsNil(obj.MenuItemID) {
-				args[obj.MenuItemID] = struct{}{}
-			}
+			args[obj.MenuItemID] = struct{}{}
 
 		}
 	}
@@ -384,7 +340,7 @@ func (orderItemL) LoadMenuItem(ctx context.Context, e boil.ContextExecutor, sing
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if queries.Equal(local.MenuItemID, foreign.ID) {
+			if local.MenuItemID == foreign.ID {
 				local.R.MenuItem = foreign
 				if foreign.R == nil {
 					foreign.R = &menuItemR{}
@@ -431,9 +387,7 @@ func (orderItemL) LoadOrder(ctx context.Context, e boil.ContextExecutor, singula
 		if object.R == nil {
 			object.R = &orderItemR{}
 		}
-		if !queries.IsNil(object.OrderID) {
-			args[object.OrderID] = struct{}{}
-		}
+		args[object.OrderID] = struct{}{}
 
 	} else {
 		for _, obj := range slice {
@@ -441,9 +395,7 @@ func (orderItemL) LoadOrder(ctx context.Context, e boil.ContextExecutor, singula
 				obj.R = &orderItemR{}
 			}
 
-			if !queries.IsNil(obj.OrderID) {
-				args[obj.OrderID] = struct{}{}
-			}
+			args[obj.OrderID] = struct{}{}
 
 		}
 	}
@@ -500,7 +452,7 @@ func (orderItemL) LoadOrder(ctx context.Context, e boil.ContextExecutor, singula
 
 	for _, local := range slice {
 		for _, foreign := range resultSlice {
-			if queries.Equal(local.OrderID, foreign.ID) {
+			if local.OrderID == foreign.ID {
 				local.R.Order = foreign
 				if foreign.R == nil {
 					foreign.R = &orderR{}
@@ -541,7 +493,7 @@ func (o *OrderItem) SetMenuItem(ctx context.Context, exec boil.ContextExecutor, 
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	queries.Assign(&o.MenuItemID, related.ID)
+	o.MenuItemID = related.ID
 	if o.R == nil {
 		o.R = &orderItemR{
 			MenuItem: related,
@@ -558,39 +510,6 @@ func (o *OrderItem) SetMenuItem(ctx context.Context, exec boil.ContextExecutor, 
 		related.R.OrderItems = append(related.R.OrderItems, o)
 	}
 
-	return nil
-}
-
-// RemoveMenuItem relationship.
-// Sets o.R.MenuItem to nil.
-// Removes o from all passed in related items' relationships struct.
-func (o *OrderItem) RemoveMenuItem(ctx context.Context, exec boil.ContextExecutor, related *MenuItem) error {
-	var err error
-
-	queries.SetScanner(&o.MenuItemID, nil)
-	if _, err = o.Update(ctx, exec, boil.Whitelist("menu_item_id")); err != nil {
-		return errors.Wrap(err, "failed to update local table")
-	}
-
-	if o.R != nil {
-		o.R.MenuItem = nil
-	}
-	if related == nil || related.R == nil {
-		return nil
-	}
-
-	for i, ri := range related.R.OrderItems {
-		if queries.Equal(o.MenuItemID, ri.MenuItemID) {
-			continue
-		}
-
-		ln := len(related.R.OrderItems)
-		if ln > 1 && i < ln-1 {
-			related.R.OrderItems[i] = related.R.OrderItems[ln-1]
-		}
-		related.R.OrderItems = related.R.OrderItems[:ln-1]
-		break
-	}
 	return nil
 }
 
@@ -621,7 +540,7 @@ func (o *OrderItem) SetOrder(ctx context.Context, exec boil.ContextExecutor, ins
 		return errors.Wrap(err, "failed to update local table")
 	}
 
-	queries.Assign(&o.OrderID, related.ID)
+	o.OrderID = related.ID
 	if o.R == nil {
 		o.R = &orderItemR{
 			Order: related,
@@ -638,39 +557,6 @@ func (o *OrderItem) SetOrder(ctx context.Context, exec boil.ContextExecutor, ins
 		related.R.OrderItems = append(related.R.OrderItems, o)
 	}
 
-	return nil
-}
-
-// RemoveOrder relationship.
-// Sets o.R.Order to nil.
-// Removes o from all passed in related items' relationships struct.
-func (o *OrderItem) RemoveOrder(ctx context.Context, exec boil.ContextExecutor, related *Order) error {
-	var err error
-
-	queries.SetScanner(&o.OrderID, nil)
-	if _, err = o.Update(ctx, exec, boil.Whitelist("order_id")); err != nil {
-		return errors.Wrap(err, "failed to update local table")
-	}
-
-	if o.R != nil {
-		o.R.Order = nil
-	}
-	if related == nil || related.R == nil {
-		return nil
-	}
-
-	for i, ri := range related.R.OrderItems {
-		if queries.Equal(o.OrderID, ri.OrderID) {
-			continue
-		}
-
-		ln := len(related.R.OrderItems)
-		if ln > 1 && i < ln-1 {
-			related.R.OrderItems[i] = related.R.OrderItems[ln-1]
-		}
-		related.R.OrderItems = related.R.OrderItems[:ln-1]
-		break
-	}
 	return nil
 }
 
