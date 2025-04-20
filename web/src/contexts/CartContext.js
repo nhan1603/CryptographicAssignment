@@ -4,15 +4,39 @@ const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(() => {
-    // Initialize cart from localStorage if available
+    const token = localStorage.getItem('token');
     const savedCart = localStorage.getItem('cart');
-    return savedCart ? JSON.parse(savedCart) : [];
+    // Only restore cart if there's a valid session
+    if (token && savedCart) {
+      try {
+        return JSON.parse(savedCart);
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
   });
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
+    const token = localStorage.getItem('token');
+    if (token) {
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
   }, [cart]);
+
+  // Clear cart when token changes or is removed
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'token' && !e.newValue) {
+        setCart([]);
+        localStorage.removeItem('cart');
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const addToCart = (item) => {
     setCart(prevCart => {
@@ -44,6 +68,11 @@ export const CartProvider = ({ children }) => {
     );
   };
 
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem('cart');
+  };
+
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   return (
@@ -52,6 +81,7 @@ export const CartProvider = ({ children }) => {
       addToCart,
       removeFromCart,
       updateQuantity,
+      clearCart,
       total,
     }}>
       {children}

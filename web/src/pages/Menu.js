@@ -1,36 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Grid, Typography, CircularProgress } from '@mui/material';
 import MenuItemCard from '../components/MenuItemCard';
+import { useNavigate } from 'react-router-dom';
+import { useAuthenticatedFetch } from '../utils/api';
 
 const Menu = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const fetchWithAuth = useAuthenticatedFetch();
 
   useEffect(() => {
-    fetchMenuItems();
-  }, []);
+    let mounted = true; // For cleanup
 
-  const fetchMenuItems = async () => {
-    try {
-      const response = await fetch('/api/public/v1/menu');
-      if (!response.ok) {
-        throw new Error('Failed to fetch menu items');
+    const fetchMenuItems = async () => {
+      try {
+        const response = await fetchWithAuth('/api/authenticated/v1/menu');
+        if (mounted && response && response.items) {
+          setMenuItems(response.items);
+        }
+      } catch (err) {
+        if (mounted) {
+          setError(err.message);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
       }
-      const responseData = await response.json();
-      
-      // Assuming the API returns { success: boolean, data: MenuItem[] }
-      if (responseData) {
-        setMenuItems(responseData.items);
-      } else {
-        throw new Error(responseData.error || 'Failed to fetch menu items');
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchMenuItems();
+
+    // Cleanup function
+    return () => {
+      mounted = false;
+    };
+  }, []); // Empty dependency array, ignore fetchWithAuth
 
   if (loading) {
     return (

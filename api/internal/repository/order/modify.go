@@ -9,7 +9,7 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
-func (r impl) Create(ctx context.Context, order model.Order) error {
+func (r impl) Create(ctx context.Context, order model.Order) (int, error) {
 	orderDb := dbmodel.Order{
 		UserID:      int(order.UserID),
 		TotalAmount: order.TotalAmount,
@@ -17,7 +17,7 @@ func (r impl) Create(ctx context.Context, order model.Order) error {
 
 	err := orderDb.Insert(ctx, r.dbConn, boil.Infer())
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	orderId := orderDb.ID
@@ -32,10 +32,10 @@ func (r impl) Create(ctx context.Context, order model.Order) error {
 
 		err := itemDb.Insert(ctx, r.dbConn, boil.Infer())
 		if err != nil {
-			return err
+			return 0, err
 		}
 	}
-	return nil
+	return orderId, nil
 }
 
 func (r impl) Update(ctx context.Context, order model.Order) error {

@@ -15,6 +15,7 @@ func (i impl) Create(ctx context.Context, user *model.User) error {
 	dbUser := dbmodel.User{
 		Email:        user.Email,
 		PasswordHash: user.Password,
+		Username:     user.Name,
 	}
 	err := dbUser.Insert(ctx, i.dbConn, boil.Infer())
 	log.Println("Finish insert with values " + dbUser.Email)

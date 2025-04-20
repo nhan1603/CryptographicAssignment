@@ -8,9 +8,9 @@ import (
 	"github.com/nhan1603/CryptographicAssignment/api/internal/model"
 )
 
-func (c impl) CreateOrder(ctx context.Context, order model.Order) error {
+func (c impl) CreateOrder(ctx context.Context, order model.Order) (int, error) {
 	if order.UserID <= 0 || len(order.Items) == 0 {
-		return errors.New("invalid order data")
+		return 0, errors.New("invalid order data")
 	}
 
 	// Calculate total amount and validate items
@@ -18,11 +18,11 @@ func (c impl) CreateOrder(ctx context.Context, order model.Order) error {
 	for indx, item := range order.Items {
 		menuItem, err := c.repo.Menu().GetByID(ctx, int(item.MenuItemID))
 		if err != nil {
-			return err
+			return 0, err
 		}
 
 		if !menuItem.IsAvailable {
-			return errors.New("menu item not available")
+			return 0, errors.New("menu item not available")
 		}
 
 		item.UnitPrice = menuItem.Price

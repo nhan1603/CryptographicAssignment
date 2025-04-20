@@ -1,9 +1,21 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { CartProvider } from './contexts/CartContext';
 import Menu from './pages/Menu';
 import Cart from './pages/Cart';
+import Login from './pages/Login';
 import Navbar from './components/Navbar';
+import Checkout from './pages/Checkout';
+import OrderSuccess from './pages/OrderSuccess';
+
+// Protected Route component
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    return <Navigate to="/login" />;
+  }
+  return children;
+};
 
 function App() {
   return (
@@ -11,8 +23,39 @@ function App() {
       <CartProvider>
         <Navbar />
         <Routes>
-          <Route path="/" element={<Menu />} />
-          <Route path="/cart" element={<Cart />} />
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Menu />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cart"
+            element={
+              <ProtectedRoute>
+                <Cart />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute>
+                <Checkout />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/order-success"
+            element={
+              <ProtectedRoute>
+                <OrderSuccess />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </CartProvider>
     </BrowserRouter>

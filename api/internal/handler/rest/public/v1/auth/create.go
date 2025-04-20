@@ -3,6 +3,7 @@ package auth
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/nhan1603/CryptographicAssignment/api/internal/appconfig/httpserver"
 	"github.com/nhan1603/CryptographicAssignment/api/internal/model"
@@ -15,6 +16,7 @@ type CreateUserResponse struct {
 
 type CreateUserRequest struct {
 	Email    string `json:"email"`
+	Name     string `json:"username"`
 	Password string `json:"password"`
 }
 
@@ -26,8 +28,14 @@ func (h Handler) CreateUser() http.HandlerFunc {
 			return err
 		}
 
+		if strings.TrimSpace(req.Email) == "" || strings.TrimSpace(req.Password) == "" ||
+			strings.TrimSpace(req.Name) == "" {
+			return webErrInvalidEmailOrPassword
+		}
+
 		user := model.User{
 			Email:    req.Email,
+			Name:     req.Name,
 			Password: req.Password,
 		}
 
