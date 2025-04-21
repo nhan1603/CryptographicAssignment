@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Navbar from './components/Navbar';
 import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
+import Orders from './pages/Orders';
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -53,6 +54,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <OrderSuccess />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/orders"
+            element={
+              <ProtectedRoute>
+                <Orders />
               </ProtectedRoute>
             }
           />

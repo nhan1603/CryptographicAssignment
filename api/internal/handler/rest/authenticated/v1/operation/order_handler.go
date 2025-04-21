@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/nhan1603/CryptographicAssignment/api/internal/appconfig/httpserver"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/appconfig/iam"
 	"github.com/nhan1603/CryptographicAssignment/api/internal/model"
 )
 
@@ -15,13 +16,19 @@ type CreateOrderResponse struct {
 }
 
 type CreateOrderRequest struct {
-	UserID      int64             `json:"user_id"`
 	TotalAmount float64           `json:"total_amount"`
 	Items       []model.OrderItem `json:"items,omitempty"`
 }
 
 func (h Handler) CreateOrder() http.HandlerFunc {
 	return httpserver.HandlerErr(func(w http.ResponseWriter, r *http.Request) error {
+		ctx := r.Context()
+		var userData iam.HostProfile
+		ctxUserValue := ctx.Value(iam.UserProfileKey)
+		if ctxUserValue != nil {
+			userData = ctxUserValue.(iam.HostProfile)
+		}
+		userID := userData.ID
 
 		var req CreateOrderRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -29,7 +36,7 @@ func (h Handler) CreateOrder() http.HandlerFunc {
 			return err
 		}
 
-		if req.UserID < 0 || req.TotalAmount <= 0 {
+		if req.TotalAmount <= 0 {
 			return webErrInvalidRequest
 		}
 
@@ -39,8 +46,8 @@ func (h Handler) CreateOrder() http.HandlerFunc {
 			}
 		}
 
-		orderData, err := h.orderCtrl.CreateOrder(r.Context(), model.Order{
-			UserID:      req.UserID,
+		orderData, err := h.orderCtrl.CreateOrder(ctx, model.Order{
+			UserID:      userID,
 			TotalAmount: req.TotalAmount,
 			Items:       req.Items,
 		})
@@ -49,6 +56,36 @@ func (h Handler) CreateOrder() http.HandlerFunc {
 		}
 
 		httpserver.RespondJSON(w, CreateOrderResponse{
+			Success: true,
+			Data:    orderData,
+		})
+
+		return nil
+	})
+}
+
+// GetOrdersResponse represents result of getting all orders response
+type GetOrdersResponse struct {
+	Success bool          `json:"success"`
+	Data    []model.Order `json:"data"`
+}
+
+func (h Handler) GetAllOrders() http.HandlerFunc {
+	return httpserver.HandlerErr(func(w http.ResponseWriter, r *http.Request) error {
+		ctx := r.Context()
+		var userData iam.HostProfile
+		ctxUserValue := ctx.Value(iam.UserProfileKey)
+		if ctxUserValue != nil {
+			userData = ctxUserValue.(iam.HostProfile)
+		}
+		userID := userData.ID
+
+		orderData, err := h.orderCtrl.GetUserOrders(ctx, int(userID))
+		if err != nil {
+			return webInternalSerror
+		}
+
+		httpserver.RespondJSON(w, GetOrdersResponse{
 			Success: true,
 			Data:    orderData,
 		})

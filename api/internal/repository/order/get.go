@@ -64,7 +64,8 @@ func (r impl) GetByUserID(ctx context.Context, userID int) ([]model.Order, error
 
 	for _, data := range datas {
 		// Get order items for each order
-		items, err := dbmodel.OrderItems(dbmodel.OrderItemWhere.OrderID.EQ(data.ID)).All(ctx, r.dbConn)
+		items, err := dbmodel.OrderItems(dbmodel.OrderItemWhere.OrderID.EQ(data.ID),
+			qm.Load(dbmodel.OrderItemRels.MenuItem)).All(ctx, r.dbConn)
 		if err != nil {
 			return nil, err
 		}
@@ -72,14 +73,18 @@ func (r impl) GetByUserID(ctx context.Context, userID int) ([]model.Order, error
 		// Convert order items to model
 		orderItems := []model.OrderItem{}
 		for _, item := range items {
-			orderItems = append(orderItems, model.OrderItem{
-				ID:         int64(item.ID),
-				OrderID:    int64(item.OrderID),
-				MenuItemID: int64(item.MenuItemID),
-				Quantity:   item.Quantity,
-				UnitPrice:  item.UnitPrice,
-				Subtotal:   item.Subtotal,
-			})
+			if item.R != nil && item.R.MenuItem != nil {
+				menuDB := item.R.MenuItem
+				orderItems = append(orderItems, model.OrderItem{
+					ID:         int64(item.ID),
+					OrderID:    int64(item.OrderID),
+					MenuItemID: int64(item.MenuItemID),
+					Quantity:   item.Quantity,
+					UnitPrice:  item.UnitPrice,
+					Subtotal:   item.Subtotal,
+					Name:       menuDB.Name,
+				})
+			}
 		}
 
 		result = append(result, model.Order{

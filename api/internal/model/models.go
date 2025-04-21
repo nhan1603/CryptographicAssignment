@@ -34,6 +34,7 @@ type OrderItem struct {
 	Quantity   int      `json:"quantity" db:"quantity"`
 	UnitPrice  float64  `json:"unit_price" db:"unit_price"`
 	Subtotal   float64  `json:"subtotal" db:"subtotal"`
+	Name       string   `json:"name" db:"name"`
 	MenuItem   MenuItem `json:"menu_item,omitempty" db:"-"`
 }
 

@@ -37,6 +37,7 @@ func (rtr router) authenticated(r chi.Router) {
 		r.Get(prefix+"/menu", operationH.GetMenuItems())
 		r.Post(prefix+"/order", operationH.CreateOrder())
 		r.Post(prefix+"/order/update_status", operationH.UpdateOrderStatus())
+		r.Get(prefix+"/orders", operationH.GetAllOrders())
 	})
 }
 
@@ -58,9 +59,6 @@ func (rtr router) public(r chi.Router) {
 			authH := authHandler.New(rtr.authCtrl)
 			r.Post(prefix+"/login", authH.AuthenticateOperationUser())
 			r.Post(prefix+"/user", authH.CreateUser())
-
-			operationH := operation.New(rtr.menuCtrl, rtr.orderCtrl)
-			r.Get(prefix+"/menu", operationH.GetMenuItems())
 		})
 	})
 }
