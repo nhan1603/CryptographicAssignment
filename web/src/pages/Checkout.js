@@ -23,6 +23,7 @@ const Checkout = () => {
   const fetchWithAuth = useAuthenticatedFetch();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [orderId, setOrderId] = useState(null);
 
   // Redirect if cart is empty
   if (cart.length === 0) {
@@ -30,40 +31,72 @@ const Checkout = () => {
     return null;
   }
 
-  const handlePaymentSuccess = async (data) => {
-    console.log(data);
-    clearCart();
-    navigate('/order-success');
-    // setLoading(true);
-    // try {
-    //   // Send payment details to your backend
-    //   const response = await fetchWithAuth('/api/authenticated/v1/orders', {
-    //     method: 'POST',
-    //     body: JSON.stringify({
-    //       paypalOrderId: data.orderID,
-    //       items: cart.map(item => ({
-    //         menuItemId: item.id,
-    //         quantity: item.quantity,
-    //         unitPrice: item.price,
-    //         subtotal: item.price * item.quantity
-    //       })),
-    //       totalAmount: total
-    //     })
-    //   });
+  const createOrder = async () => {
+    try {
+      // Create order in our system first
+      const response = await fetchWithAuth('/api/authenticated/v1/order', {
+        method: 'POST',
+        body: JSON.stringify({
+          user_id: 1, // You might want to get this from your auth context
+          total_amount: total,
+          items: cart.map(item => ({
+            menu_item_id: item.id,
+            quantity: item.quantity,
+            unit_price: item.price
+          }))
+        })
+      });
 
-    //   if (response.success) {
-    //     // Clear cart and redirect to success page
-    //     clearCart();
-    //     navigate('/order-success');
-    //   } else {
-    //     throw new Error('Failed to capture payment');
-    //   }
-    // } catch (err) {
-    //   setError('Failed to process payment. Please try again.');
-    //   console.error('Payment error:', err);
-    // } finally {
-    //   setLoading(false);
-    // }
+      if (!response.success) {
+        throw new Error('Failed to create order');
+      }
+
+      // Store the order ID for later use
+      setOrderId(response.data.id);
+
+      // Return the PayPal order creation
+      return {
+        purchase_units: [
+          {
+            amount: {
+              value: total.toFixed(2),
+              currency_code: "USD"
+            },
+            description: "Food Order"
+          }
+        ]
+      };
+    } catch (err) {
+      setError('Failed to create order. Please try again.');
+      throw err;
+    }
+  };
+
+  const handlePaymentSuccess = async (data) => {
+    setLoading(true);
+    try {
+      // Update order status to paid
+      const response = await fetchWithAuth('/api/authenticated/v1/order/update_status', {
+        method: 'POST',
+        body: JSON.stringify({
+          order_id: orderId,
+          status: 'paid'
+        })
+      });
+
+      if (!response.success) {
+        throw new Error('Failed to update order status');
+      }
+
+      // Clear cart and redirect to success page
+      clearCart();
+      navigate('/order-success');
+    } catch (err) {
+      setError('Failed to process payment. Please try again.');
+      console.error('Payment error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -108,16 +141,8 @@ const Checkout = () => {
           ) : (
             <PayPalButtons
               createOrder={(data, actions) => {
-                return actions.order.create({
-                  purchase_units: [
-                    {
-                      amount: {
-                        value: total.toFixed(2),
-                        currency_code: "USD"
-                      },
-                      description: "Food Order"
-                    }
-                  ]
+                return createOrder().then(orderData => {
+                  return actions.order.create(orderData);
                 });
               }}
               onApprove={async (data, actions) => {

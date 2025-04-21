@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 golang:1.22.6-alpine3.19 AS base
+FROM --platform=linux/amd64 golang:1.23.8-alpine3.21 AS base
 RUN apk --no-cache add \
     bash \
     build-base \

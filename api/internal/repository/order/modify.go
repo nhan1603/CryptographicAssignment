@@ -27,7 +27,7 @@ func (r impl) Create(ctx context.Context, order model.Order) (int, error) {
 			MenuItemID: int(item.MenuItemID),
 			Quantity:   item.Quantity,
 			UnitPrice:  item.UnitPrice,
-			Subtotal:   float64(item.Quantity) * item.UnitPrice,
+			Subtotal:   item.Subtotal,
 		}
 
 		err := itemDb.Insert(ctx, r.dbConn, boil.Infer())
@@ -38,18 +38,18 @@ func (r impl) Create(ctx context.Context, order model.Order) (int, error) {
 	return orderId, nil
 }
 
-func (r impl) Update(ctx context.Context, order model.Order) error {
+func (r impl) Update(ctx context.Context, order model.Order) (int, error) {
 	orderDb, err := dbmodel.Orders(dbmodel.OrderWhere.ID.EQ(int(order.ID)),
 		qm.Load(dbmodel.OrderRels.OrderItems)).One(ctx, r.dbConn)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	if orderDb.R != nil && orderDb.R.OrderItems != nil {
 		for _, item := range orderDb.R.OrderItems {
 			_, err = item.Delete(ctx, r.dbConn)
 			if err != nil {
-				return err
+				return 0, err
 			}
 		}
 	}
@@ -60,12 +60,12 @@ func (r impl) Update(ctx context.Context, order model.Order) error {
 			MenuItemID: int(item.MenuItemID),
 			Quantity:   item.Quantity,
 			UnitPrice:  item.UnitPrice,
-			Subtotal:   float64(item.Quantity) * item.UnitPrice,
+			Subtotal:   item.Subtotal,
 		}
 
 		err := itemDb.Insert(ctx, r.dbConn, boil.Infer())
 		if err != nil {
-			return err
+			return 0, err
 		}
 	}
 
@@ -78,7 +78,7 @@ func (r impl) Update(ctx context.Context, order model.Order) error {
 	}
 
 	_, err = orderDb.Update(ctx, r.dbConn, boil.Whitelist(cols...))
-	return err
+	return int(order.ID), err
 }
 
 func (r impl) UpdateStatus(ctx context.Context, orderId int, status string) error {

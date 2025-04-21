@@ -11,9 +11,11 @@ import {
   CircularProgress
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useCart } from '../contexts/CartContext';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { clearCart } = useCart();
   const [tab, setTab] = useState(0); // 0 for login, 1 for register
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true); // Start with loading true
@@ -95,11 +97,11 @@ const Login = () => {
         throw new Error(data.error || 'Login failed');
       }
 
-      // Store the token as-is, without Bearer prefix
+      // Store the token
       localStorage.setItem('token', data.token);
       
-      // Clear any existing cart data
-      localStorage.removeItem('cart');
+      // Clear the cart when logging in
+      clearCart();
       
       // Redirect to menu page
       navigate('/');

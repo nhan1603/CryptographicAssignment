@@ -11,6 +11,7 @@ import (
 	"github.com/nhan1603/CryptographicAssignment/api/internal/appconfig/iam"
 	"github.com/nhan1603/CryptographicAssignment/api/internal/controller/auth"
 	"github.com/nhan1603/CryptographicAssignment/api/internal/controller/menus"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/controller/orders"
 	"github.com/nhan1603/CryptographicAssignment/api/internal/repository"
 	"github.com/nhan1603/CryptographicAssignment/api/internal/repository/generator"
 )
@@ -51,8 +52,9 @@ func initRouter(
 	repo := repository.New(db)
 
 	return router{
-		ctx:      ctx,
-		authCtrl: auth.New(repo, iam.ConfigFromContext(ctx)),
-		menuCtrl: menus.New(repo),
+		ctx:       ctx,
+		authCtrl:  auth.New(repo, iam.ConfigFromContext(ctx)),
+		menuCtrl:  menus.New(repo),
+		orderCtrl: orders.New(repo),
 	}, nil
 }

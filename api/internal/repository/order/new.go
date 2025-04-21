@@ -10,7 +10,7 @@ import (
 // Repository provides the specification of the functionality provided by this pkg
 type Repository interface {
 	Create(ctx context.Context, order model.Order) (int, error)
-	Update(ctx context.Context, order model.Order) error
+	Update(ctx context.Context, order model.Order) (int, error)
 	UpdateStatus(ctx context.Context, orderId int, status string) error
 	GetByID(ctx context.Context, id int) (model.Order, error)
 	GetByUserID(ctx context.Context, userID int) ([]model.Order, error)

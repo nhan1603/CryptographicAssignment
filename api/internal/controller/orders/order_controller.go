@@ -8,9 +8,9 @@ import (
 	"github.com/nhan1603/CryptographicAssignment/api/internal/model"
 )
 
-func (c impl) CreateOrder(ctx context.Context, order model.Order) (int, error) {
+func (c impl) CreateOrder(ctx context.Context, order model.Order) (model.Order, error) {
 	if order.UserID <= 0 || len(order.Items) == 0 {
-		return 0, errors.New("invalid order data")
+		return model.Order{}, errors.New("invalid order data")
 	}
 
 	// Calculate total amount and validate items
@@ -18,11 +18,11 @@ func (c impl) CreateOrder(ctx context.Context, order model.Order) (int, error) {
 	for indx, item := range order.Items {
 		menuItem, err := c.repo.Menu().GetByID(ctx, int(item.MenuItemID))
 		if err != nil {
-			return 0, err
+			return model.Order{}, err
 		}
 
 		if !menuItem.IsAvailable {
-			return 0, errors.New("menu item not available")
+			return model.Order{}, errors.New("menu item not available")
 		}
 
 		item.UnitPrice = menuItem.Price
@@ -35,7 +35,19 @@ func (c impl) CreateOrder(ctx context.Context, order model.Order) (int, error) {
 	order.Status = model.OrderStatusPending
 	order.CreatedAt = time.Now()
 
-	return c.repo.Order().Create(ctx, order)
+	var orderID int
+	var err error
+	if order.ID == 0 {
+		orderID, err = c.repo.Order().Create(ctx, order)
+	} else {
+		orderID, err = c.repo.Order().Update(ctx, order)
+	}
+
+	if err != nil {
+		return model.Order{}, err
+	}
+	order.ID = int64(orderID)
+	return order, nil
 }
 
 func (c impl) GetOrderByID(ctx context.Context, id int) (model.Order, error) {

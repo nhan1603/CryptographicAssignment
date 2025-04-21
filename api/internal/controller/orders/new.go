@@ -9,7 +9,7 @@ import (
 
 // Controller represents the specification of this pkg
 type Controller interface {
-	CreateOrder(ctx context.Context, order model.Order) (int, error)
+	CreateOrder(ctx context.Context, order model.Order) (model.Order, error)
 	GetOrderByID(ctx context.Context, id int) (model.Order, error)
 	GetUserOrders(ctx context.Context, userID int) ([]model.Order, error)
 	UpdateOrderStatus(ctx context.Context, id int, status string) error

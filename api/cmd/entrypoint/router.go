@@ -33,8 +33,10 @@ func (rtr router) authenticated(r chi.Router) {
 		r.Use(iam.AuthenticateUserMiddleware(rtr.ctx))
 		prefix = prefix + "/v1"
 
-		operationH := operation.New(rtr.menuCtrl)
+		operationH := operation.New(rtr.menuCtrl, rtr.orderCtrl)
 		r.Get(prefix+"/menu", operationH.GetMenuItems())
+		r.Post(prefix+"/order", operationH.CreateOrder())
+		r.Post(prefix+"/order/update_status", operationH.UpdateOrderStatus())
 	})
 }
 
@@ -57,7 +59,7 @@ func (rtr router) public(r chi.Router) {
 			r.Post(prefix+"/login", authH.AuthenticateOperationUser())
 			r.Post(prefix+"/user", authH.CreateUser())
 
-			operationH := operation.New(rtr.menuCtrl)
+			operationH := operation.New(rtr.menuCtrl, rtr.orderCtrl)
 			r.Get(prefix+"/menu", operationH.GetMenuItems())
 		})
 	})
