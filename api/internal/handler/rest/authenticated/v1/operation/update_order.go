@@ -7,7 +7,7 @@ import (
 	"github.com/nhan1603/CryptographicAssignment/api/internal/appconfig/httpserver"
 )
 
-// UpdateOrderResponse represents result of creating order
+// UpdateOrderResponse represents result of updating order
 type UpdateOrderResponse struct {
 	Success bool `json:"success"`
 }

@@ -57,6 +57,8 @@ services:
       SERVER_ADDR: ":3001"
       SGT_LOC: "Asia/Singapore"
       JWT_KEY: "CCO3rTNkzj5ll9JogQW5"
+      PAYPAL_CLIENT_ID: "AdMk5sWX2p4KPXcwLUWiWaSa47mSqCepe-yHKPgFq7HzGfaVnLEgAWs_6YnEHhgqx86SQaQIXaXI50un"
+      PAYPAL_SECRET: "EJyF4yUvxG9y4CISSVizqEgkeA5PK5QftHoqYm43_KsNS_YO1zmnHTCmqCc4QTjLoCPq3kbYzg26dhmf"
 
   mockery:
     container_name: mockery

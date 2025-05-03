@@ -13,6 +13,8 @@ type Controller interface {
 	GetOrderByID(ctx context.Context, id int) (model.Order, error)
 	GetUserOrders(ctx context.Context, userID int) ([]model.Order, error)
 	UpdateOrderStatus(ctx context.Context, id int, status string) error
+	CreatePaypalOrder(ctx context.Context, order model.Order) (string, int, error)
+	CapturePaypalOrder(ctx context.Context, payPalID string, id int) error
 }
 
 // New initializes a new Controller instance and returns it

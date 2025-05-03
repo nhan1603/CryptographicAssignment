@@ -38,6 +38,8 @@ func (rtr router) authenticated(r chi.Router) {
 		r.Post(prefix+"/order", operationH.CreateOrder())
 		r.Post(prefix+"/order/update_status", operationH.UpdateOrderStatus())
 		r.Get(prefix+"/orders", operationH.GetAllOrders())
+		r.Post(prefix+"/paypal/create-order", operationH.CreatePayPalOrder())
+		r.Post(prefix+"/paypal/capture-order", operationH.CapturePayPalOrder())
 	})
 }
 

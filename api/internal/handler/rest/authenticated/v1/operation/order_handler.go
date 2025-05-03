@@ -27,6 +27,8 @@ func (h Handler) CreateOrder() http.HandlerFunc {
 		ctxUserValue := ctx.Value(iam.UserProfileKey)
 		if ctxUserValue != nil {
 			userData = ctxUserValue.(iam.HostProfile)
+		} else {
+			return webErrInternalServer
 		}
 		userID := userData.ID
 

@@ -24,6 +24,7 @@ const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [orderId, setOrderId] = useState(null);
+  const [paypalOrderId, setPaypalOrderId] = useState(null);
 
   // Redirect if cart is empty
   if (cart.length === 0) {
@@ -33,59 +34,41 @@ const Checkout = () => {
 
   const createOrder = async () => {
     try {
-      // Create order in our system first
-      const response = await fetchWithAuth('/api/authenticated/v1/order', {
+      const response = await fetchWithAuth('/api/authenticated/v1/paypal/create-order', {
         method: 'POST',
         body: JSON.stringify({
-          user_id: 1, // You might want to get this from your auth context
-          total_amount: total,
           items: cart.map(item => ({
             menu_item_id: item.id,
             quantity: item.quantity,
-            unit_price: item.price
           }))
         })
       });
-
-      if (!response.success) {
-        throw new Error('Failed to create order');
+      if (!response.paypal_order_id) {
+        throw new Error('Failed to create PayPal order');
       }
-
-      // Store the order ID for later use
-      setOrderId(response.data.id);
-
-      // Return the PayPal order creation
-      return {
-        purchase_units: [
-          {
-            amount: {
-              value: total.toFixed(2),
-              currency_code: "USD"
-            },
-            description: "Food Order"
-          }
-        ]
-      };
+      setPaypalOrderId(response.paypal_order_id);
+      setOrderId(response.order_id);
+      return response.paypal_order_id;
     } catch (err) {
-      setError('Failed to create order. Please try again.');
+      setError('Failed to create PayPal order. Please try again.');
       throw err;
     }
   };
 
-  const handlePaymentSuccess = async (data) => {
+  const handlePaymentSuccess = async (paypalOrderId) => {
     setLoading(true);
     try {
-      // Update order status to paid
-      const response = await fetchWithAuth('/api/authenticated/v1/order/update_status', {
+      // Call backend to capture the PayPal order
+      const response = await fetchWithAuth('/api/authenticated/v1/paypal/capture-order', {
         method: 'POST',
         body: JSON.stringify({
-          order_id: orderId,
-          status: 'paid'
+          paypal_order_id: paypalOrderId,
+          order_id: orderId
         })
       });
 
       if (!response.success) {
-        throw new Error('Failed to update order status');
+        throw new Error('Failed to capture PayPal payment');
       }
 
       // Clear cart and redirect to success page
@@ -140,14 +123,11 @@ const Checkout = () => {
             </Box>
           ) : (
             <PayPalButtons
-              createOrder={(data, actions) => {
-                return createOrder().then(orderData => {
-                  return actions.order.create(orderData);
-                });
+              createOrder={async () => {
+                return await createOrder();
               }}
-              onApprove={async (data, actions) => {
-                const order = await actions.order.capture();
-                await handlePaymentSuccess(order);
+              onApprove={async (data) => {
+                await handlePaymentSuccess(data.orderID);
               }}
               onError={(err) => {
                 setError('PayPal payment failed. Please try again.');
