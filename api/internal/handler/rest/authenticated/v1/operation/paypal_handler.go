@@ -43,7 +43,7 @@ func (h Handler) CreatePayPalOrder() http.HandlerFunc {
 		}
 
 		for _, item := range req.Items {
-			if item.ID < 0 || item.Quantity <= 0 || item.UnitPrice <= 0 {
+			if item.ID < 0 || item.Quantity <= 0 {
 				return webErrInvalidRequest
 			}
 		}
@@ -54,6 +54,7 @@ func (h Handler) CreatePayPalOrder() http.HandlerFunc {
 			Items:       req.Items,
 		})
 		if err != nil {
+			log.Printf("Error from controller: %+v\n", err)
 			return webInternalSerror
 		}
 

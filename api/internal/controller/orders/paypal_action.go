@@ -58,8 +58,13 @@ func (c impl) CreatePaypalOrder(ctx context.Context, order model.Order) (string,
 			},
 			Description: "Food Order",
 		},
-	}, &paypal.PaymentSource{},
-		&paypal.ApplicationContext{})
+	}, nil,
+		&paypal.ApplicationContext{
+			BrandName:  "University Catering System",
+			UserAction: "PAY_NOW",
+			ReturnURL:  "https://example.com/return",
+			CancelURL:  "https://example.com/cancel",
+		})
 	if err != nil {
 		return "", 0, err
 	}
