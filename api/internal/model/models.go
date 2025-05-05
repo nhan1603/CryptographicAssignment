@@ -44,7 +44,7 @@ type PayPalTransaction struct {
 	OrderID             int64     `json:"order_id" db:"order_id"`
 	PayPalTransactionID string    `json:"paypal_transaction_id" db:"paypal_transaction_id"`
 	PaymentStatus       string    `json:"payment_status" db:"payment_status"`
-	PaymentAmount       float64   `json:"payment_amount" db:"payment_amount"`
+	PaymentAmount       string    `json:"payment_amount" db:"payment_amount"`
 	Currency            string    `json:"currency" db:"currency"`
 	PayerEmail          string    `json:"payer_email" db:"payer_email"`
 	PaymentDate         time.Time `json:"payment_date" db:"payment_date"`

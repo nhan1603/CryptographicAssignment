@@ -22,7 +22,7 @@ const MenuItemCard = ({ item }) => {
         </Typography>
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h6" color="primary">
-            ${item.price.toFixed(2)}
+            £{item.price.toFixed(2)}
           </Typography>
           <Button 
             variant="contained" 

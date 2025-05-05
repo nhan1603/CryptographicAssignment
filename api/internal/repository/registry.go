@@ -7,6 +7,7 @@ import (
 
 	"github.com/nhan1603/CryptographicAssignment/api/internal/repository/menu"
 	"github.com/nhan1603/CryptographicAssignment/api/internal/repository/order"
+	"github.com/nhan1603/CryptographicAssignment/api/internal/repository/payment"
 	"github.com/nhan1603/CryptographicAssignment/api/internal/repository/user"
 	pkgerrors "github.com/pkg/errors"
 	"github.com/volatiletech/sqlboiler/v4/boil"
@@ -16,25 +17,28 @@ type Registry interface {
 	User() user.Repository
 	Menu() menu.Repository
 	Order() order.Repository
+	Payment() payment.Repository
 	DoInTx(ctx context.Context, txFunc TxFunc) error
 }
 
 // New returns an implementation instance which satisfying Registry
 func New(pgConn *sql.DB) Registry {
 	return impl{
-		user:   user.New(pgConn),
-		menu:   menu.New(pgConn),
-		order:  order.New(pgConn),
-		pgConn: pgConn,
+		user:    user.New(pgConn),
+		menu:    menu.New(pgConn),
+		order:   order.New(pgConn),
+		payment: payment.New(pgConn),
+		pgConn:  pgConn,
 	}
 }
 
 type impl struct {
-	user   user.Repository
-	menu   menu.Repository
-	order  order.Repository
-	txExec boil.Transactor
-	pgConn *sql.DB
+	user    user.Repository
+	menu    menu.Repository
+	order   order.Repository
+	payment payment.Repository
+	txExec  boil.Transactor
+	pgConn  *sql.DB
 }
 
 // TxFunc is a function that can be executed in a transaction
@@ -53,6 +57,10 @@ func (i impl) Menu() menu.Repository {
 // Order returns order repo
 func (i impl) Order() order.Repository {
 	return i.order
+}
+
+func (i impl) Payment() payment.Repository {
+	return i.payment
 }
 
 // DoInTx handles db operations in a transaction
@@ -76,10 +84,11 @@ func (i impl) DoInTx(ctx context.Context, txFunc TxFunc) error {
 	}()
 
 	newI := impl{
-		user:   user.New(tx),
-		menu:   menu.New(tx),
-		order:  order.New(tx),
-		txExec: tx,
+		user:    user.New(tx),
+		menu:    menu.New(tx),
+		order:   order.New(tx),
+		payment: payment.New(tx),
+		txExec:  tx,
 	}
 
 	if err = txFunc(newI); err != nil {

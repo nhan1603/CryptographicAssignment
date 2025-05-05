@@ -37,7 +37,7 @@ const Menu = () => {
     return () => {
       mounted = false;
     };
-  }, []); // Empty dependency array, ignore fetchWithAuth
+  }, []);
 
   if (loading) {
     return (

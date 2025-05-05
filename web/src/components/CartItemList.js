@@ -28,7 +28,7 @@ const CartItemList = () => {
         >
           <ListItemText
             primary={item.name}
-            secondary={`$${item.price.toFixed(2)} each`}
+            secondary={`£${item.price.toFixed(2)} each`}
           />
           <Box sx={{ display: 'flex', alignItems: 'center', ml: 2 }}>
             <IconButton 

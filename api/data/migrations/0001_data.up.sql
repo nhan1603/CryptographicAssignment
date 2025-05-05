@@ -50,11 +50,11 @@ CREATE TABLE paypal_transactions
     order_id INTEGER REFERENCES orders(id) NOT NULL,
     paypal_transaction_id VARCHAR(100) NOT NULL UNIQUE,
     payment_status VARCHAR(50) NOT NULL,
-    payment_amount double precision NOT NULL,
-    currency VARCHAR(3) DEFAULT 'USD',
+    payment_amount VARCHAR(100) NOT NULL,
+    currency VARCHAR(3) DEFAULT 'GBP',
     payer_email VARCHAR(255),
     payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT valid_payment_status CHECK (payment_status IN ('pending', 'completed', 'failed', 'refunded'))
+    CONSTRAINT valid_payment_status CHECK (payment_status IN ('PENDING', 'COMPLETED', 'FAILED', 'REFUNDED'))
 );
 
 -- Create indexes for better query performance

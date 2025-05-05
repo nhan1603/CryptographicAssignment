@@ -85,7 +85,7 @@ const Checkout = () => {
   return (
     <PayPalScriptProvider options={{ 
       "client-id": PAYPAL_CLIENT_ID,
-      currency: "USD"
+      currency: "GBP"
     }}>
       <Container maxWidth="md" sx={{ py: 4 }}>
         <Paper elevation={3} sx={{ p: 3 }}>
@@ -100,7 +100,7 @@ const Checkout = () => {
                   secondary={`Quantity: ${item.quantity}`}
                 />
                 <Typography>
-                  ${(item.price * item.quantity).toFixed(2)}
+                  £{(item.price * item.quantity).toFixed(2)}
                 </Typography>
               </ListItem>
             ))}
@@ -108,7 +108,7 @@ const Checkout = () => {
           <Divider sx={{ my: 2 }} />
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
             <Typography variant="h6">Total:</Typography>
-            <Typography variant="h6">${total.toFixed(2)}</Typography>
+            <Typography variant="h6">£{total.toFixed(2)}</Typography>
           </Box>
 
           {error && (

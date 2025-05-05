@@ -95,7 +95,7 @@ const Orders = () => {
                     size="small"
                   />
                   <Typography>
-                    ${order.total_amount.toFixed(2)}
+                    £{order.total_amount.toFixed(2)}
                   </Typography>
                 </Box>
               </Box>
@@ -114,11 +114,11 @@ const Orders = () => {
                   <Box>
                     <Typography>{item.name}</Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Quantity: {item.quantity} × ${item.unit_price.toFixed(2)}
+                      Quantity: {item.quantity} × £{item.unit_price.toFixed(2)}
                     </Typography>
                   </Box>
                   <Typography>
-                    ${item.subtotal.toFixed(2)}
+                    £{item.subtotal.toFixed(2)}
                   </Typography>
                 </Box>
               ))}

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/nhan1603/CryptographicAssignment/api/internal/model"
+	crypto_helper "github.com/nhan1603/CryptographicAssignment/api/internal/pkg/cryptos"
 	"github.com/plutov/paypal/v4"
 )
 
@@ -53,7 +54,7 @@ func (c impl) CreatePaypalOrder(ctx context.Context, order model.Order) (string,
 	paypalOrder, err := client.CreateOrder(context.Background(), paypal.OrderIntentCapture, []paypal.PurchaseUnitRequest{
 		{
 			Amount: &paypal.PurchaseUnitAmount{
-				Currency: "USD",
+				Currency: "GBP",
 				Value:    fmt.Sprintf("%.2f", totalAmount),
 			},
 			Description: "Food Order",
@@ -109,6 +110,33 @@ func (c impl) CapturePaypalOrder(ctx context.Context, payPalID string, id int) e
 		log.Printf("Err capturing order status: %+v\n", err)
 		return err
 	}
+
+	go func() {
+		var PaymentAmount string
+		if len(captureResult.PurchaseUnits) > 0 && len(captureResult.PurchaseUnits[0].Payments.Captures) > 0 {
+			PaymentAmount = captureResult.PurchaseUnits[0].Payments.Captures[0].Amount.Value
+		}
+
+		encryptionKey := os.Getenv("CYPHER_KEY")
+		encryptedEmail, err := crypto_helper.EncryptMessage([]byte(encryptionKey), captureResult.Payer.EmailAddress)
+		if err != nil {
+			log.Printf("Err encrypting email for order with ID %d and Paypal order ID %s: %+v\n", order.ID, payPalID, err)
+			return
+		}
+
+		err = c.repo.Payment().Create(context.Background(), model.PayPalTransaction{
+			OrderID:             order.ID,
+			PayPalTransactionID: payPalID,
+			PaymentStatus:       captureResult.Status,
+			Currency:            "GBP",
+			PaymentAmount:       PaymentAmount,
+			PayerEmail:          encryptedEmail,
+		})
+		if err != nil {
+			log.Printf("Err saving order with ID %d and Paypal order ID %s capture result: %+v\n", order.ID, payPalID, err)
+		}
+	}()
+
 	if captureResult.Status != "COMPLETED" {
 		log.Printf("Error payment not completed")
 		return errors.New("error payment not completed")

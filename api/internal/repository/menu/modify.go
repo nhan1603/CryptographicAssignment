@@ -11,14 +11,14 @@ import (
 )
 
 func (r impl) Create(ctx context.Context, item model.MenuItem) error {
-	dbUser := dbmodel.MenuItem{
+	dbMenu := dbmodel.MenuItem{
 		Name:        item.Name,
 		Description: null.StringFrom(item.Description),
 		Price:       item.Price,
 		Category:    null.StringFrom(item.Category),
 		IsAvailable: null.BoolFrom(true),
 	}
-	err := dbUser.Insert(ctx, r.dbConn, boil.Infer())
+	err := dbMenu.Insert(ctx, r.dbConn, boil.Infer())
 
 	if err != nil {
 		pkgerrors.WithStack(err)
@@ -27,7 +27,7 @@ func (r impl) Create(ctx context.Context, item model.MenuItem) error {
 }
 
 func (r impl) Update(ctx context.Context, item model.MenuItem) error {
-	dbUser := dbmodel.MenuItem{
+	dbMenu := dbmodel.MenuItem{
 		Name:        item.Name,
 		Description: null.StringFrom(item.Description),
 		Price:       item.Price,
@@ -35,7 +35,7 @@ func (r impl) Update(ctx context.Context, item model.MenuItem) error {
 		Category:    null.StringFrom(item.Category),
 		IsAvailable: null.BoolFrom(true),
 	}
-	err := dbUser.Insert(ctx, r.dbConn, boil.Infer())
+	err := dbMenu.Insert(ctx, r.dbConn, boil.Infer())
 
 	if err != nil {
 		pkgerrors.WithStack(err)

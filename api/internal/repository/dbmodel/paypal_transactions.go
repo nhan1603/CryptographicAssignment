@@ -28,7 +28,7 @@ type PaypalTransaction struct {
 	OrderID             int         `boil:"order_id" json:"order_id" toml:"order_id" yaml:"order_id"`
 	PaypalTransactionID string      `boil:"paypal_transaction_id" json:"paypal_transaction_id" toml:"paypal_transaction_id" yaml:"paypal_transaction_id"`
 	PaymentStatus       string      `boil:"payment_status" json:"payment_status" toml:"payment_status" yaml:"payment_status"`
-	PaymentAmount       float64     `boil:"payment_amount" json:"payment_amount" toml:"payment_amount" yaml:"payment_amount"`
+	PaymentAmount       string      `boil:"payment_amount" json:"payment_amount" toml:"payment_amount" yaml:"payment_amount"`
 	Currency            null.String `boil:"currency" json:"currency,omitempty" toml:"currency" yaml:"currency,omitempty"`
 	PayerEmail          null.String `boil:"payer_email" json:"payer_email,omitempty" toml:"payer_email" yaml:"payer_email,omitempty"`
 	PaymentDate         null.Time   `boil:"payment_date" json:"payment_date,omitempty" toml:"payment_date" yaml:"payment_date,omitempty"`
@@ -84,7 +84,7 @@ var PaypalTransactionWhere = struct {
 	OrderID             whereHelperint
 	PaypalTransactionID whereHelperstring
 	PaymentStatus       whereHelperstring
-	PaymentAmount       whereHelperfloat64
+	PaymentAmount       whereHelperstring
 	Currency            whereHelpernull_String
 	PayerEmail          whereHelpernull_String
 	PaymentDate         whereHelpernull_Time
@@ -93,7 +93,7 @@ var PaypalTransactionWhere = struct {
 	OrderID:             whereHelperint{field: "\"paypal_transactions\".\"order_id\""},
 	PaypalTransactionID: whereHelperstring{field: "\"paypal_transactions\".\"paypal_transaction_id\""},
 	PaymentStatus:       whereHelperstring{field: "\"paypal_transactions\".\"payment_status\""},
-	PaymentAmount:       whereHelperfloat64{field: "\"paypal_transactions\".\"payment_amount\""},
+	PaymentAmount:       whereHelperstring{field: "\"paypal_transactions\".\"payment_amount\""},
 	Currency:            whereHelpernull_String{field: "\"paypal_transactions\".\"currency\""},
 	PayerEmail:          whereHelpernull_String{field: "\"paypal_transactions\".\"payer_email\""},
 	PaymentDate:         whereHelpernull_Time{field: "\"paypal_transactions\".\"payment_date\""},
