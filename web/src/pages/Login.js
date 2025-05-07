@@ -112,6 +112,35 @@ const Login = () => {
     }
   };
 
+  const validatePassword = (password) => {
+    const minLength = 6;
+    const maxLength = 15;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    const errors = [];
+    
+    if (password.length < minLength || password.length > maxLength) {
+      errors.push('Password must be between 6 and 15 characters');
+    }
+    if (!hasUpperCase) {
+      errors.push('Must contain at least one uppercase letter');
+    }
+    if (!hasLowerCase) {
+      errors.push('Must contain at least one lowercase letter');
+    }
+    if (!hasNumbers) {
+      errors.push('Must contain at least one number');
+    }
+    if (!hasSpecialChar) {
+      errors.push('Must contain at least one special character');
+    }
+
+    return errors;
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
@@ -119,6 +148,13 @@ const Login = () => {
     // Validate passwords match
     if (registerData.password !== registerData.confirmPassword) {
       setError('Passwords do not match');
+      return;
+    }
+
+    // Validate password strength
+    const passwordErrors = validatePassword(registerData.password);
+    if (passwordErrors.length > 0) {
+      setError(passwordErrors.join('\n'));
       return;
     }
 
@@ -234,6 +270,7 @@ const Login = () => {
               required
               value={registerData.password}
               onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
+              helperText="Password must be 6-15 characters with uppercase, lowercase, number, and special character"
             />
             <TextField
               fullWidth

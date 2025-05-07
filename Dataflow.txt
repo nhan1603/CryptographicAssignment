@@ -9,6 +9,6 @@ Frontend (React)         Backend (Go)                PayPal
       |                       |                        |
       |--- capture-order ---->|                        |
       |     (orderID)         |                        |
-      |                       |--- capture ----------->|
+      |                       |--- capture order------>| (PayPal API)
       |                       |<-- result -------------|
-      |<-- success -----------|                        |
+      |<-- success / fail ----|                        |

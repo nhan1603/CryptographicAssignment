@@ -1,18 +1,26 @@
 # CryptographicAssignment
 
-Assignment for Remitano Interview preparation
+Assignment for 003_CWRK:Cryptographic Assignment
 
 ### Backend Setup
 
+- Install go 1.23
+
+- cd `/api`
+
+- `go mod vendor`
+
 - Setup Docker and Docker Compose, and make sure it is running
+
+- `cd ..`
 
 - Setup project by running `make setup`
 
+- Seed the necessary data into the database: `make pg-drop` then `make pg-migrate`
+
 - Start server with `make run`
 
-- Running test with `make api-test`
-
-- The API URLs for querying is: `http://localhost:3001/api/public/ping`
+- The API URLs for checking back-end availability is: `http://localhost:3001/api/public/ping`
 
 ### Frontend Setup
 

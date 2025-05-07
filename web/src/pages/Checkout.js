@@ -15,7 +15,7 @@ import { useCart } from '../contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
 import { useAuthenticatedFetch } from '../utils/api';
 
-const PAYPAL_CLIENT_ID = "AdMk5sWX2p4KPXcwLUWiWaSa47mSqCepe-yHKPgFq7HzGfaVnLEgAWs_6YnEHhgqx86SQaQIXaXI50un";
+const PAYPAL_CLIENT_ID = "Afbo85wWbwkEpevvCjTbzgVA2ibewJp6tiGL2Cp5gl561j4oTOPLJNf3zyo28Xrq5Q1_uIdmbEO1aMOK";
 
 const Checkout = () => {
   const { cart, total, clearCart } = useCart();

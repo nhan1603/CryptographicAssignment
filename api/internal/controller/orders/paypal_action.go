@@ -51,15 +51,16 @@ func (c impl) CreatePaypalOrder(ctx context.Context, order model.Order) (string,
 	}
 
 	// Create PayPal order
-	paypalOrder, err := client.CreateOrder(context.Background(), paypal.OrderIntentCapture, []paypal.PurchaseUnitRequest{
-		{
-			Amount: &paypal.PurchaseUnitAmount{
-				Currency: "GBP",
-				Value:    fmt.Sprintf("%.2f", totalAmount),
+	paypalOrder, err := client.CreateOrder(context.Background(), paypal.OrderIntentCapture,
+		[]paypal.PurchaseUnitRequest{
+			{
+				Amount: &paypal.PurchaseUnitAmount{
+					Currency: "GBP",
+					Value:    fmt.Sprintf("%.2f", totalAmount),
+				},
+				Description: "Food Order",
 			},
-			Description: "Food Order",
-		},
-	}, nil,
+		}, nil,
 		&paypal.ApplicationContext{
 			BrandName:  "University Catering System",
 			UserAction: "PAY_NOW",
@@ -70,7 +71,7 @@ func (c impl) CreatePaypalOrder(ctx context.Context, order model.Order) (string,
 		return "", 0, err
 	}
 
-	// Save order in DB with status "pending" and PayPal order ID (optional, but recommended)
+	// Save order in DB with status "pending"
 	order.TotalAmount = totalAmount
 	order.Status = model.OrderStatusPending
 	order.CreatedAt = time.Now()
@@ -111,12 +112,14 @@ func (c impl) CapturePaypalOrder(ctx context.Context, payPalID string, id int) e
 		return err
 	}
 
+	// Simultaneously capture the order information in a separate thread
 	go func() {
 		var PaymentAmount string
 		if len(captureResult.PurchaseUnits) > 0 && len(captureResult.PurchaseUnits[0].Payments.Captures) > 0 {
 			PaymentAmount = captureResult.PurchaseUnits[0].Payments.Captures[0].Amount.Value
 		}
 
+		// Encrypt the payer's email to enhance security
 		encryptionKey := os.Getenv("CYPHER_KEY")
 		encryptedEmail, err := crypto_helper.EncryptMessage([]byte(encryptionKey), captureResult.Payer.EmailAddress)
 		if err != nil {
@@ -137,6 +140,7 @@ func (c impl) CapturePaypalOrder(ctx context.Context, payPalID string, id int) e
 		}
 	}()
 
+	// Verify the status of the order
 	if captureResult.Status != "COMPLETED" {
 		log.Printf("Error payment not completed")
 		return errors.New("error payment not completed")

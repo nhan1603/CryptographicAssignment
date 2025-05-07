@@ -2,9 +2,11 @@ package iam
 
 import (
 	"errors"
+	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	crypto_helper "github.com/nhan1603/CryptographicAssignment/api/internal/pkg/cryptos"
 	pkgerrors "github.com/pkg/errors"
 )
 
@@ -23,11 +25,23 @@ func (cfg Config) GenerateToken(claim JWTClaim) (string, error) {
 		return "", pkgerrors.WithStack(err)
 	}
 
-	return tokenString, nil
+	encryptionKey := os.Getenv("CYPHER_KEY")
+	encryptedToken, err := crypto_helper.EncryptMessage([]byte(encryptionKey), tokenString)
+	if err != nil {
+		return "", pkgerrors.WithStack(err)
+	}
+
+	return encryptedToken, nil
 }
 
 // ValidateToken validates token
-func (cfg Config) ValidateToken(strToken string) (*jwt.Token, error) {
+func (cfg Config) ValidateToken(entryptedToken string) (*jwt.Token, error) {
+	encryptionKey := os.Getenv("CYPHER_KEY")
+	strToken, err := crypto_helper.DecryptMessage([]byte(encryptionKey), entryptedToken)
+	if err != nil {
+		return nil, pkgerrors.WithStack(err)
+	}
+
 	token, err := jwt.ParseWithClaims(
 		strToken,
 		&JWTClaim{},

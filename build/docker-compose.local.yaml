@@ -57,8 +57,9 @@ services:
       SERVER_ADDR: ":3001"
       SGT_LOC: "Asia/Singapore"
       JWT_KEY: "CCO3rTNkzj5ll9JogQW5"
-      PAYPAL_CLIENT_ID: "AdMk5sWX2p4KPXcwLUWiWaSa47mSqCepe-yHKPgFq7HzGfaVnLEgAWs_6YnEHhgqx86SQaQIXaXI50un"
-      PAYPAL_SECRET: "EJyF4yUvxG9y4CISSVizqEgkeA5PK5QftHoqYm43_KsNS_YO1zmnHTCmqCc4QTjLoCPq3kbYzg26dhmf"
+      PAYPAL_CLIENT_ID: "Afbo85wWbwkEpevvCjTbzgVA2ibewJp6tiGL2Cp5gl561j4oTOPLJNf3zyo28Xrq5Q1_uIdmbEO1aMOK"
+      PAYPAL_SECRET: "EGGFFjj4CLPNgz8mWqgkMbeTnqpg0BjcIlAQ7iEPK9HKoUNblxuNCY5eQv2Xasjv07KCbC0sJTn3qpDH"
+      CYPHER_KEY: "0123456789abcdef"
 
   mockery:
     container_name: mockery
