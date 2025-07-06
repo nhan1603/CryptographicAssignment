@@ -6,6 +6,8 @@ Assignment for 003_CWRK:Cryptographic Assignment
 
 - Install go 1.23
 
+- Install `make` command
+
 - cd `/api`
 
 - `go mod vendor`
@@ -23,6 +25,8 @@ Assignment for 003_CWRK:Cryptographic Assignment
 - The API URLs for checking back-end availability is: `http://localhost:3001/api/public/ping`
 
 ### Frontend Setup
+
+- Install nodejs
 
 - cd `/web`
 
